@@ -8,10 +8,63 @@ import {
   faqs,
   company,
 } from "@/data/site";
+import { TruckIcon, SearchIcon, BoxIcon, LockIcon, StarRating } from "@/components/Icons";
+import LineBanner from "@/components/LineBanner";
+import PriceSimulator from "@/components/PriceSimulator";
+import { siteUrl } from "@/data/site";
+
+const trustIcons = {
+  truck: TruckIcon,
+  search: SearchIcon,
+  box: BoxIcon,
+  lock: LockIcon,
+};
 
 export default function Home() {
+  const [, addressRegion, addressLocality] =
+    company.address.match(/^(.{2,3}[都道府県])(.+)$/) || [];
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: company.name,
+    alternateName: company.legalName,
+    url: siteUrl,
+    telephone: company.phone,
+    description:
+      "エスワン・ムーディーズ・マドンナ・FALENOなどの人気レーベルを強化買取中のアダルトDVD・ブルーレイ買取専門店。",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: addressLocality || company.address,
+      addressRegion: addressRegion || undefined,
+      postalCode: company.postalCode.replace("〒", ""),
+      addressCountry: "JP",
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      opens: "09:00",
+      closes: "18:00",
+    },
+    priceRange: "¥¥",
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       {/* HERO */}
       <section className="w-full bg-gradient-to-b from-[#201a17] to-[#2c231e] text-white">
         <div className="max-w-[1200px] mx-auto px-6 md:px-8 pt-16 pb-14 flex flex-col items-center text-center gap-5">
@@ -75,15 +128,18 @@ export default function Home() {
       {/* TRUST BAR */}
       <section className="w-full bg-white border-b border-[#ece6dc]">
         <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-7 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {trustItems.map((item) => (
-            <div key={item.title} className="text-center flex flex-col gap-1">
-              <div className="text-2xl">{item.icon}</div>
-              <div className="text-sm font-bold text-[#26221e]">
-                {item.title}
+          {trustItems.map((item) => {
+            const Icon = trustIcons[item.icon];
+            return (
+              <div key={item.title} className="text-center flex flex-col items-center gap-1.5">
+                <Icon className="w-7 h-7 text-[#b3242b]" />
+                <div className="text-sm font-bold text-[#26221e]">
+                  {item.title}
+                </div>
+                <div className="text-xs text-[#726b5e]">{item.desc}</div>
               </div>
-              <div className="text-xs text-[#a39d92]">{item.desc}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -97,37 +153,72 @@ export default function Home() {
             <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
               買取価格の目安
             </h2>
-            <p className="text-[13px] text-[#a39d92]">
+            <p className="text-[13px] text-[#726b5e]">
               状態・発売時期・レーベルにより査定額は変動します。まずは無料査定をご利用ください。
             </p>
           </div>
 
           <div className="bg-white rounded-2xl overflow-hidden border border-[#ece6dc]">
-            <div className="grid grid-cols-3 bg-[#26221e] text-white text-[13px] font-bold">
-              <div className="py-4 px-5">状態・条件</div>
-              <div className="py-4 px-5">対象商品</div>
-              <div className="py-4 px-5 text-right">買取率</div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <caption className="sr-only">
+                  アダルトDVD・ブルーレイの買取価格の目安
+                </caption>
+                <thead>
+                  <tr className="bg-[#26221e] text-white text-[13px]">
+                    <th scope="col" className="py-4 px-5 text-left font-bold">
+                      状態・条件
+                    </th>
+                    <th scope="col" className="py-4 px-5 text-left font-bold">
+                      対象商品
+                    </th>
+                    <th scope="col" className="py-4 px-5 text-right font-bold">
+                      買取率
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {priceTiers.map((tier) => (
+                    <tr key={tier.condition} className="border-t border-[#ece6dc]">
+                      <th
+                        scope="row"
+                        className="py-4.5 px-5 text-left font-bold text-[#26221e]"
+                      >
+                        {tier.condition}
+                      </th>
+                      <td className="py-4.5 px-5 text-[#5c554d]">
+                        {tier.target}
+                      </td>
+                      <td className="py-4.5 px-5 text-right font-extrabold text-[#b3242b] text-lg">
+                        {tier.rate}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {priceTiers.map((tier) => (
-              <div
-                key={tier.condition}
-                className="grid grid-cols-3 border-t border-[#ece6dc] text-sm items-center"
-              >
-                <div className="py-4.5 px-5 font-bold text-[#26221e]">
-                  {tier.condition}
-                </div>
-                <div className="py-4.5 px-5 text-[#5c554d]">
-                  {tier.target}
-                </div>
-                <div className="py-4.5 px-5 text-right font-extrabold text-[#b3242b] text-lg">
-                  {tier.rate}
-                </div>
-              </div>
-            ))}
           </div>
-          <p className="text-xs text-[#a39d92] text-center">
+          <p className="text-xs text-[#726b5e] text-center">
             ※ケースやジャケットがない「ディスクのみ」も買取可能です。コピー品・雑誌付録は対象外となります。
           </p>
+        </div>
+      </section>
+
+      {/* PRICE SIMULATOR */}
+      <section id="simulator" className="w-full px-6 md:px-8 py-16 bg-[#f7f3ee]">
+        <div className="max-w-[700px] mx-auto flex flex-col gap-8">
+          <div className="text-center flex flex-col gap-2.5">
+            <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
+              SIMULATOR
+            </div>
+            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+              買取価格シミュレーター
+            </h2>
+            <p className="text-[13px] text-[#726b5e]">
+              本数と状態を選ぶだけで、概算の買取金額をすぐに確認できます。
+            </p>
+          </div>
+          <PriceSimulator />
         </div>
       </section>
 
@@ -180,13 +271,13 @@ export default function Home() {
                 key={voice.name}
                 className="bg-white rounded-2xl p-6 flex flex-col gap-3 border border-[#ece6dc]"
               >
-                <div className="text-[#e8a97a] text-sm tracking-widest">
-                  ★★★★★
+                <div className="text-[#e8a97a]">
+                  <StarRating className="w-4 h-4" />
                 </div>
                 <div className="text-[13px] leading-loose text-[#4a453d]">
                   {voice.text}
                 </div>
-                <div className="text-xs text-[#a39d92] font-bold">
+                <div className="text-xs text-[#726b5e] font-bold">
                   {voice.name}
                 </div>
               </div>
@@ -248,7 +339,7 @@ export default function Home() {
                   {faq.q}
                 </div>
                 <div className="flex gap-2.5 text-[13px] leading-loose text-[#5c554d]">
-                  <span className="text-[#a39d92] font-bold">A</span>
+                  <span className="text-[#726b5e] font-bold">A</span>
                   {faq.a}
                 </div>
               </div>
@@ -262,6 +353,13 @@ export default function Home() {
               よくある質問をもっと見る →
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* LINE CTA */}
+      <section className="w-full px-6 md:px-8 py-12 bg-white border-t border-[#ece6dc]">
+        <div className="max-w-[900px] mx-auto">
+          <LineBanner />
         </div>
       </section>
 

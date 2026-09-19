@@ -32,7 +32,7 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
-        <p className="max-w-[700px] mx-auto text-xs text-[#a39d92] mt-6 text-center">
+        <p className="max-w-[700px] mx-auto text-xs text-[#726b5e] mt-6 text-center">
           古物営業法に基づく表記　{company.antiqueLicense}
         </p>
       </section>

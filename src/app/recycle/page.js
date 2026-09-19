@@ -1,5 +1,6 @@
 import PageHero from "@/components/PageHero";
 import RecycleForm from "@/components/RecycleForm";
+import LineBanner from "@/components/LineBanner";
 import { company } from "@/data/site";
 
 export const metadata = {
@@ -34,6 +35,12 @@ export default function RecyclePage() {
 
       <RecycleForm />
 
+      <section className="w-full px-6 md:px-8 pb-12">
+        <div className="max-w-[700px] mx-auto">
+          <LineBanner />
+        </div>
+      </section>
+
       <section className="w-full px-6 md:px-8 pb-16">
         <div className="max-w-[700px] mx-auto bg-white border border-[#ece6dc] rounded-2xl p-8 flex flex-col gap-3">
           <h3 className="text-base font-bold text-[#26221e]">
@@ -46,7 +53,7 @@ export default function RecyclePage() {
             <br />
             {company.shipTo}
           </div>
-          <p className="text-xs text-[#a39d92] leading-relaxed">
+          <p className="text-xs text-[#726b5e] leading-relaxed">
             最寄りの配送業者より着払いで発送してください（ヤマト運輸／郵便局／佐川急便）。最寄りのコンビニへ持ち込みでも可能です。ヤマト運輸などで送られる場合は、段ボールの個口数を段ボールに記載して頂くようお願い致します。記載がない場合、通常の査定（到着から2日〜1週間）よりお時間がかかる場合がございます。
           </p>
         </div>

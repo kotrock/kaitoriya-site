@@ -79,7 +79,7 @@ export default function TermsOfUsePage() {
               </p>
             </div>
           ))}
-          <p className="text-xs text-[#a39d92] pt-4 border-t border-[#ece6dc]">
+          <p className="text-xs text-[#726b5e] pt-4 border-t border-[#ece6dc]">
             付則　この規約は2025年1月1日から適用されます。
           </p>
         </div>

@@ -9,8 +9,27 @@ export const metadata = {
 };
 
 export default function FaqPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <PageHero
         eyebrow="FAQ"
         title="よくある質問"
@@ -28,7 +47,7 @@ export default function FaqPage() {
                 {faq.q}
               </div>
               <div className="flex gap-2.5 text-[13px] leading-loose text-[#5c554d]">
-                <span className="text-[#a39d92] font-bold">A</span>
+                <span className="text-[#726b5e] font-bold">A</span>
                 {faq.a}
               </div>
             </div>

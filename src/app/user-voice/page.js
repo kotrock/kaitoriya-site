@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import { StarRating } from "@/components/Icons";
 import { voices } from "@/data/site";
 
 export const metadata = {
@@ -19,13 +20,13 @@ export default function UserVoicePage() {
                 key={voice.name}
                 className="bg-white rounded-2xl p-6 flex flex-col gap-3 border border-[#ece6dc]"
               >
-                <div className="text-[#e8a97a] text-sm tracking-widest">
-                  ★★★★★
+                <div className="text-[#e8a97a]">
+                  <StarRating className="w-4 h-4" />
                 </div>
                 <div className="text-[13px] leading-loose text-[#4a453d]">
                   {voice.text}
                 </div>
-                <div className="text-xs text-[#a39d92] font-bold">
+                <div className="text-xs text-[#726b5e] font-bold">
                   {voice.name}
                 </div>
               </div>

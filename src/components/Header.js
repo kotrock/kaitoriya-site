@@ -22,7 +22,7 @@ export default function Header() {
             <div className="text-lg font-extrabold text-[#26221e] tracking-tight">
               高買屋
             </div>
-            <div className="text-[10px] text-[#a39d92] tracking-wide">
+            <div className="text-[10px] text-[#726b5e] tracking-wide">
               アダルトDVD高価買取専門店
             </div>
           </div>

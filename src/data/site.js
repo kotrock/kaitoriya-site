@@ -1,3 +1,8 @@
+// Vercelの標準ドメインを暫定利用。独自ドメインが決まったら
+// NEXT_PUBLIC_SITE_URL 環境変数で上書きしてください。
+export const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://kaitoriya-site.vercel.app";
+
 export const company = {
   name: "高買屋",
   legalName: "有限会社 萬屋カンパニー",
@@ -13,6 +18,8 @@ export const company = {
   parentSite: "https://www.paradise-box.com/",
   antiqueLicense: "宮城県公安委員会許可第221240000756号",
   bank: "七十七銀行より指定の口座へお振込み",
+  // TODO: 実際のLINE公式アカウントの友だち追加URLに差し替えてください
+  lineUrl: "https://lin.ee/xxxxxxx",
 };
 
 export const nav = [
@@ -36,18 +43,45 @@ export const labels = [
 ];
 
 export const trustItems = [
-  { icon: "📦", title: "送料無料", desc: "全国一律（離島等除く）" },
-  { icon: "🔍", title: "査定無料", desc: "何本でも0円で査定" },
-  { icon: "📮", title: "段ボール無料", desc: "5箱まで無料提供" },
-  { icon: "🔒", title: "個人情報厳重管理", desc: "梱包は中身が見えない配慮" },
+  { icon: "truck", title: "送料無料", desc: "全国一律（離島等除く）" },
+  { icon: "search", title: "査定無料", desc: "何本でも0円で査定" },
+  { icon: "box", title: "段ボール無料", desc: "5箱まで無料提供" },
+  { icon: "lock", title: "個人情報厳重管理", desc: "梱包は中身が見えない配慮" },
 ];
 
 export const priceTiers = [
-  { condition: "新作・未開封", target: "発売1ヶ月以内・完品", rate: "60〜65%" },
-  { condition: "新作・開封済み", target: "発売1ヶ月以内・良品", rate: "45〜59%" },
-  { condition: "通常作品", target: "発売から時間が経過した作品", rate: "20〜44%" },
-  { condition: "ディスクのみ", target: "ケース・ジャケットなし", rate: "10〜20%" },
+  {
+    condition: "新作・未開封",
+    target: "発売1ヶ月以内・完品",
+    rate: "60〜65%",
+    rateMin: 60,
+    rateMax: 65,
+  },
+  {
+    condition: "新作・開封済み",
+    target: "発売1ヶ月以内・良品",
+    rate: "45〜59%",
+    rateMin: 45,
+    rateMax: 59,
+  },
+  {
+    condition: "通常作品",
+    target: "発売から時間が経過した作品",
+    rate: "20〜44%",
+    rateMin: 20,
+    rateMax: 44,
+  },
+  {
+    condition: "ディスクのみ",
+    target: "ケース・ジャケットなし",
+    rate: "10〜20%",
+    rateMin: 10,
+    rateMax: 20,
+  },
 ];
+
+// シミュレーター用の仮の平均定価（1本あたり）。商品ごとの正確な定価データがないための概算値。
+export const avgUnitPrice = 4000;
 
 export const steps = [
   { num: "1", title: "お申し込み", desc: "フォームからお客様情報と商品情報をご入力ください。仮査定の希望有無も選べます。" },

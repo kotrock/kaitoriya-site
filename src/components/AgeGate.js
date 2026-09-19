@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { company } from "@/data/site";
+import { HeartIcon } from "@/components/Icons";
 
 const STORAGE_KEY = "kaitoriya_age_verified";
 
@@ -43,7 +44,7 @@ export default function AgeGate() {
     <div className="fixed inset-0 z-100 bg-[#14100e]/95 flex items-center justify-center p-6">
       {status === "leave" ? (
         <div className="w-full max-w-[440px] bg-white rounded-2xl p-10 text-center flex flex-col gap-4">
-          <div className="text-4xl">🙏</div>
+          <HeartIcon className="w-10 h-10 text-[#b3242b] mx-auto" />
           <h2 className="text-xl font-bold text-[#26221e]">
             ご利用ありがとうございました
           </h2>
@@ -78,7 +79,7 @@ export default function AgeGate() {
               はい（18歳以上です）
             </button>
           </div>
-          <p className="text-[11px] text-[#a39d92]">
+          <p className="text-[11px] text-[#726b5e]">
             古物営業法に基づく表記　{company.antiqueLicense}
           </p>
         </div>
