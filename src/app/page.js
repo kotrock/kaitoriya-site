@@ -3,14 +3,29 @@ import {
   labels,
   trustItems,
   priceTiers,
+  bonusTiers,
   steps,
   voices,
+  results,
+  resultsSummary,
   faqs,
   company,
+  firstTimeBonus,
 } from "@/data/site";
-import { TruckIcon, SearchIcon, BoxIcon, LockIcon, StarRating } from "@/components/Icons";
+import {
+  TruckIcon,
+  SearchIcon,
+  BoxIcon,
+  LockIcon,
+  CalendarIcon,
+  StoreIcon,
+  StarRating,
+} from "@/components/Icons";
 import LineBanner from "@/components/LineBanner";
 import PriceSimulator from "@/components/PriceSimulator";
+import ResultsSummary from "@/components/ResultsSummary";
+import ResultsTable from "@/components/ResultsTable";
+import BonusTiers from "@/components/BonusTiers";
 import { siteUrl } from "@/data/site";
 
 const trustIcons = {
@@ -18,6 +33,8 @@ const trustIcons = {
   search: SearchIcon,
   box: BoxIcon,
   lock: LockIcon,
+  calendar: CalendarIcon,
+  store: StoreIcon,
 };
 
 export default function Home() {
@@ -127,7 +144,7 @@ export default function Home() {
 
       {/* TRUST BAR */}
       <section className="w-full bg-white border-b border-[#ece6dc]">
-        <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-7 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-7 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
           {trustItems.map((item) => {
             const Icon = trustIcons[item.icon];
             return (
@@ -141,6 +158,13 @@ export default function Home() {
             );
           })}
         </div>
+      </section>
+
+      {/* FIRST TIME CAMPAIGN */}
+      <section className="w-full px-6 md:px-8 py-4 bg-[#fbeceb] border-y border-[#f3d4d2]">
+        <p className="max-w-[1000px] mx-auto text-center text-sm md:text-base font-extrabold text-[#b3242b] break-keep">
+          初めてのご利用で査定額+{firstTimeBonus}キャンペーン実施中
+        </p>
       </section>
 
       {/* PRICE TABLE */}
@@ -203,11 +227,11 @@ export default function Home() {
             <ul className="md:hidden divide-y divide-[#ece6dc]">
               {priceTiers.map((tier) => (
                 <li key={tier.condition} className="p-5 flex flex-col gap-1.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-bold text-[#26221e] break-keep min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="font-bold text-[#26221e] break-keep">
                       {tier.condition}
                     </span>
-                    <span className="font-extrabold text-[#b3242b] text-xl text-right shrink-0">
+                    <span className="font-extrabold text-[#b3242b] text-xl text-right ml-auto whitespace-nowrap">
                       {tier.rate}
                     </span>
                   </div>
@@ -229,6 +253,24 @@ export default function Home() {
               送料無料・査定無料・段ボール無料でご利用いただけます。
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* BONUS TIERS */}
+      <section className="w-full px-6 md:px-8 py-16 bg-white border-t border-[#ece6dc]">
+        <div className="max-w-[1000px] mx-auto flex flex-col gap-8">
+          <div className="text-center flex flex-col gap-2.5">
+            <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
+              BONUS
+            </div>
+            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+              まとめて売るとお得
+            </h2>
+            <p className="text-[13px] text-[#726b5e]">
+              本数に応じて買取金額にボーナスが加算されます。
+            </p>
+          </div>
+          <BonusTiers aRank={bonusTiers.aRank} bRank={bonusTiers.bRank} />
         </div>
       </section>
 
@@ -311,12 +353,50 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link
               href="/user-voice"
               className="text-sm font-bold text-[#b3242b] hover:underline"
             >
               利用者の声をもっと見る →
+            </Link>
+            <a
+              href={company.googleReviewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-bold text-[#5c554d] hover:text-[#b3242b] hover:underline"
+            >
+              Googleの口コミを見る ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      <section id="results" className="w-full px-6 md:px-8 py-16 bg-white border-t border-[#ece6dc]">
+        <div className="max-w-[800px] mx-auto flex flex-col gap-8">
+          <div className="text-center flex flex-col gap-2.5">
+            <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
+              RESULTS
+            </div>
+            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+              買取実績
+            </h2>
+            <p className="text-[13px] text-[#726b5e]">
+              直近の買取実績を一部ご紹介します。
+            </p>
+          </div>
+          <ResultsSummary
+            totalCount={resultsSummary.totalCount}
+            totalAmount={resultsSummary.totalAmount}
+          />
+          <ResultsTable items={results.slice(0, 5)} />
+          <div className="text-center">
+            <Link
+              href="/results"
+              className="text-sm font-bold text-[#b3242b] hover:underline"
+            >
+              買取実績をもっと見る →
             </Link>
           </div>
         </div>
@@ -330,7 +410,9 @@ export default function Home() {
               個人情報不要
             </div>
             <div className="text-lg sm:text-xl font-extrabold break-keep">
-              売るほどでもないDVDは無料回収します
+              売るほどでもないDVDは
+              <br className="sm:hidden" />
+              無料回収します
             </div>
             <div className="text-[13px] text-[#cfc6bc]">
               段ボール5箱まで無料提供・送料無料・何点でもOK

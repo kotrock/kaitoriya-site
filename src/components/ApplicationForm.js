@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
+import { payoutOptions } from "@/data/site";
 
 const STEPS = ["お客様情報", "詳細", "確認"];
 
@@ -11,8 +12,14 @@ const assessmentLabels = {
   preview: "仮査定申請（仮査定あり）",
 };
 
+const paymentLabels = {
+  bank: `銀行振込（振込手数料${payoutOptions.bankFee}）`,
+  paypay: `PayPay受け取り（${payoutOptions.paypayBonus}プラス）`,
+};
+
 export default function ApplicationForm() {
   const [assessmentType, setAssessmentType] = useState("speed");
+  const [paymentMethod, setPaymentMethod] = useState("bank");
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
@@ -198,6 +205,48 @@ export default function ApplicationForm() {
               </option>
             </select>
           </div>
+
+          <div className="flex flex-col gap-4">
+            <h3 className="text-base font-bold text-[#26221e]">
+              お支払い方法
+            </h3>
+            <div className="flex flex-col gap-3 text-sm text-[#26221e]">
+              <label className="flex items-start gap-2">
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value={paymentLabels.bank}
+                  className="mt-1"
+                  checked={paymentMethod === "bank"}
+                  onChange={() => setPaymentMethod("bank")}
+                />
+                <span>
+                  <span className="font-semibold">{paymentLabels.bank}</span>
+                  <br />
+                  <span className="text-xs text-[#726b5e]">
+                    指定の口座へお振込みいたします。
+                  </span>
+                </span>
+              </label>
+              <label className="flex items-start gap-2">
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value={paymentLabels.paypay}
+                  className="mt-1"
+                  checked={paymentMethod === "paypay"}
+                  onChange={() => setPaymentMethod("paypay")}
+                />
+                <span>
+                  <span className="font-semibold">{paymentLabels.paypay}</span>
+                  <br />
+                  <span className="text-xs text-[#726b5e]">
+                    振込手数料がかからず、逆にボーナスを上乗せしてお支払いします。
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div
@@ -211,6 +260,7 @@ export default function ApplicationForm() {
             <SummaryRow label="買取希望商品の本数" value={summary.quantity} />
             <SummaryRow label="査定方法" value={summary.assessment_type} />
             <SummaryRow label="発送用の段ボール" value={summary.box_option} />
+            <SummaryRow label="お支払い方法" value={summary.payment_method} />
           </div>
           <label className="flex items-start gap-2 text-xs text-[#5c554d]">
             <input type="checkbox" required className="mt-0.5" />

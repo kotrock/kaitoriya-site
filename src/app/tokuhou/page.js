@@ -1,5 +1,5 @@
 import PageHero from "@/components/PageHero";
-import { company } from "@/data/site";
+import { company, payoutOptions } from "@/data/site";
 
 export const metadata = {
   title: "特定商取引法 | アダルトDVD高価買取の高買屋",
@@ -14,7 +14,10 @@ const rows = [
     `電話番号　${company.phone}　メールアドレス　${company.email}　（受付時間：${company.phoneHours}）`,
   ],
   ["送料", "ヤマト運輸／郵便局／佐川急便　全国一律：無料　※北海道・沖縄・離島除く"],
-  ["お支払い", `銀行振込　${company.bank}`],
+  [
+    "お支払い",
+    `銀行振込　${company.bank}（振込手数料${payoutOptions.bankFee}）／PayPay受け取り（${payoutOptions.paypayBonus}プラスでお支払い）`,
+  ],
 ];
 
 export default function TokuhouPage() {

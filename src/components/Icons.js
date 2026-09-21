@@ -143,6 +143,46 @@ export function PhoneIcon({ className = "w-6 h-6" }) {
   );
 }
 
+export function CalendarIcon({ className = "w-6 h-6" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3.5" y="5" width="17" height="15" rx="2" />
+      <path d="M3.5 9.5h17" />
+      <path d="M8 3v3.5" />
+      <path d="M16 3v3.5" />
+    </svg>
+  );
+}
+
+export function StoreIcon({ className = "w-6 h-6" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3.5 9.5l1-5h15l1 5" />
+      <path d="M4 9.5v9.5h16V9.5" />
+      <path d="M3.5 9.5a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0" />
+      <path d="M10 19v-5h4v5" />
+    </svg>
+  );
+}
+
 export function LineIcon({ className = "w-6 h-6" }) {
   return (
     <svg
