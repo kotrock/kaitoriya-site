@@ -11,13 +11,15 @@ export default function PriceSimulator() {
   const [tierIndex, setTierIndex] = useState(0);
 
   const tier = priceTiers[tierIndex];
+  const hasRate = typeof tier.rateMin === "number" && typeof tier.rateMax === "number";
 
   const { low, high } = useMemo(() => {
+    if (!hasRate) return { low: null, high: null };
     const qty = Math.max(1, Number(quantity) || 0);
     const low = Math.round((qty * avgUnitPrice * tier.rateMin) / 100);
     const high = Math.round((qty * avgUnitPrice * tier.rateMax) / 100);
     return { low, high };
-  }, [quantity, tier]);
+  }, [quantity, tier, hasRate]);
 
   return (
     <div className="bg-white border border-[#ece6dc] rounded-2xl p-7 md:p-8 flex flex-col gap-6">
@@ -50,12 +52,25 @@ export default function PriceSimulator() {
 
       <div className="bg-[#f7f3ee] rounded-xl p-6 text-center flex flex-col gap-1.5">
         <div className="text-xs font-bold text-[#726b5e]">概算買取金額</div>
-        <div className="text-3xl md:text-[40px] font-extrabold text-[#b3242b] leading-tight">
-          ¥{yen.format(low)} 〜 ¥{yen.format(high)}
-        </div>
-        <div className="text-[11px] text-[#726b5e]">
-          買取率 {tier.rate}・1本あたり平均定価{yen.format(avgUnitPrice)}円で試算
-        </div>
+        {hasRate ? (
+          <>
+            <div className="text-3xl md:text-[40px] font-extrabold text-[#b3242b] leading-tight">
+              ¥{yen.format(low)} 〜 ¥{yen.format(high)}
+            </div>
+            <div className="text-[11px] text-[#726b5e]">
+              買取率 {tier.rate}・1本あたり平均定価{yen.format(avgUnitPrice)}円で試算
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-2xl md:text-3xl font-extrabold text-[#b3242b] leading-tight">
+              個別査定（定額）
+            </div>
+            <div className="text-[11px] text-[#726b5e]">
+              状態を確認のうえ個別に査定いたします。無料査定でご相談ください。
+            </div>
+          </>
+        )}
       </div>
 
       <p className="text-xs text-[#726b5e] leading-relaxed">

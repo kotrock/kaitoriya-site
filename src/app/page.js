@@ -100,14 +100,14 @@ export default function Home() {
                 対象レーベル新作
               </div>
               <div className="text-[15px] font-bold mt-1">
-                発売から1ヶ月以内・完品
+                発売2週間以内・完品
               </div>
             </div>
             <div className="hidden md:block w-px self-stretch bg-[#ece6dc]" />
             <div className="text-left">
               <div className="text-[13px] text-[#5c554d]">定価の</div>
               <div className="text-[56px] font-extrabold text-[#b3242b] leading-none">
-                最大65<span className="text-2xl">%</span>買取
+                最大50<span className="text-2xl">%</span>買取
               </div>
             </div>
           </div>
@@ -198,9 +198,17 @@ export default function Home() {
               </table>
             </div>
           </div>
-          <p className="text-xs text-[#726b5e] text-center">
-            ※ケースやジャケットがない「ディスクのみ」も買取可能です。コピー品・雑誌付録は対象外となります。
-          </p>
+          <div className="flex flex-col gap-1.5 text-center">
+            <p className="text-xs text-[#726b5e]">
+              ※査定は発売日・定価・状態を基準に行います（開封・未開封は問いません）。
+            </p>
+            <p className="text-xs text-[#726b5e]">
+              ※ケースやジャケットがない「ディスクのみ」も買取可能です。コピー品・雑誌付録は対象外となります。
+            </p>
+            <p className="text-sm font-bold text-[#26221e]">
+              送料無料・査定無料・段ボール無料でご利用いただけます。
+            </p>
+          </div>
         </div>
       </section>
 
@@ -381,6 +389,12 @@ export default function Home() {
           >
             買取申込フォームへ進む
           </Link>
+          <a
+            href={`tel:${company.phoneTel}`}
+            className="text-[13px] text-white/85 hover:text-white underline decoration-white/40"
+          >
+            お電話でのお申込みは {company.phone}（{company.phoneHours}）
+          </a>
         </div>
       </section>
     </>

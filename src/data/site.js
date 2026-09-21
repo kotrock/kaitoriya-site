@@ -12,6 +12,7 @@ export const company = {
   address: "宮城県仙台市泉区松森字坂下1-1",
   shipTo: "パラダイスＢＯＸ仙台店",
   phone: "022-343-1588",
+  phoneTel: "0223431588",
   phoneHours: "9時〜18時",
   email: "pbox_sendai@yahoo.co.jp",
   businessDesc: "本・DVD・雑貨の販売",
@@ -51,32 +52,46 @@ export const trustItems = [
 
 export const priceTiers = [
   {
-    condition: "新作・未開封",
-    target: "発売1ヶ月以内・完品",
-    rate: "60〜65%",
-    rateMin: 60,
-    rateMax: 65,
-  },
-  {
-    condition: "新作・開封済み",
-    target: "発売1ヶ月以内・良品",
-    rate: "45〜59%",
+    condition: "発売2週間以内・完品",
+    target: "最新作限定の保証価格",
+    rate: "45〜50%",
     rateMin: 45,
-    rateMax: 59,
+    rateMax: 50,
   },
   {
-    condition: "通常作品",
-    target: "発売から時間が経過した作品",
-    rate: "20〜44%",
-    rateMin: 20,
-    rateMax: 44,
+    condition: "発売1ヶ月以内・完品",
+    target: "通常の新作",
+    rate: "25〜30%",
+    rateMin: 25,
+    rateMax: 30,
   },
   {
-    condition: "ディスクのみ",
-    target: "ケース・ジャケットなし",
-    rate: "10〜20%",
-    rateMin: 10,
+    condition: "発売3ヶ月以内・完品",
+    target: "準新作",
+    rate: "15〜20%",
+    rateMin: 15,
     rateMax: 20,
+  },
+  {
+    condition: "発売4ヶ月〜1年以内・完品",
+    target: "通常作品",
+    rate: "10〜12%",
+    rateMin: 10,
+    rateMax: 12,
+  },
+  {
+    condition: "発売1年以上・完品",
+    target: "旧作",
+    rate: "3〜8%",
+    rateMin: 3,
+    rateMax: 8,
+  },
+  {
+    condition: "ディスクのみ・状態不良",
+    target: "ケース/ジャケットなし、破れ、レンタル落ち等",
+    rate: "個別査定(定額)",
+    rateMin: null,
+    rateMax: null,
   },
 ];
 
@@ -146,7 +161,7 @@ export const faqs = [
   },
   {
     q: "どんな商品が高く売れますか。",
-    a: "最新作については定価の40%〜65%での買取を行っております。有名メーカーで最新作が高く売れます。その他キャンペーンも実施しておりますのでご確認ください。",
+    a: "発売2週間以内・完品の最新作は定価の45%〜50%の保証価格で買取いたします。発売時期が新しいものほど高価買取となります。その他キャンペーンも実施しておりますのでご確認ください。",
   },
   {
     q: "大量のDVD買取でも大丈夫ですか？",

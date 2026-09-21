@@ -4,9 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "アダルトDVD高価買取の高買屋 | どこよりも高くアダルト買取ます!",
+  title: "アダルトDVD買取 最大50%〜｜査定無料・送料無料の高買屋",
   description:
-    "どこよりも高くアダルト買取ます!簡単・迅速・安心。エスワン・ムーディーズ・マドンナ・FALENOなど人気レーベルを強化買取中の高買屋。",
+    "アダルトDVD・ブルーレイを最大50%で高価買取。査定は何本でも無料、段ボールも無料提供。エスワン・ムーディーズ・マドンナなど人気レーベル強化買取中。仙台のアダルトDVD買取専門店「高買屋」。",
 };
 
 export default function RootLayout({ children }) {

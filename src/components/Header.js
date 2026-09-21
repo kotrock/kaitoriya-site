@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { nav } from "@/data/site";
+import { nav, company } from "@/data/site";
+import { PhoneIcon } from "@/components/Icons";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -36,7 +37,14 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <a
+            href={`tel:${company.phoneTel}`}
+            className="hidden lg:flex items-center gap-1.5 text-sm font-bold text-[#26221e] hover:text-[#b3242b] whitespace-nowrap"
+          >
+            <PhoneIcon className="w-4 h-4" />
+            {company.phone}
+          </a>
           <Link
             href="/application"
             className="hidden sm:inline-block bg-[#b3242b] text-white text-[13px] font-bold py-3 px-5 rounded-full whitespace-nowrap hover:bg-[#8f1c22] transition-colors"
@@ -89,6 +97,13 @@ export default function Header() {
           >
             無料査定を申し込む
           </Link>
+          <a
+            href={`tel:${company.phoneTel}`}
+            className="mt-2 flex items-center justify-center gap-1.5 py-3 text-sm font-bold text-[#26221e]"
+          >
+            <PhoneIcon className="w-4 h-4" />
+            {company.phone}（{company.phoneHours}）
+          </a>
         </nav>
       )}
     </header>

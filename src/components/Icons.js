@@ -126,6 +126,23 @@ export function StarIcon({ className = "w-4 h-4", filled = true }) {
   );
 }
 
+export function PhoneIcon({ className = "w-6 h-6" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 4h3.2l1.3 4.5-2 1.5a11.5 11.5 0 0 0 5.5 5.5l1.5-2 4.5 1.3V18a2 2 0 0 1-2 2h-.5C9.5 20 4 14.5 4 7.5V7a2 2 0 0 1 1-3z" />
+    </svg>
+  );
+}
+
 export function LineIcon({ className = "w-6 h-6" }) {
   return (
     <svg
