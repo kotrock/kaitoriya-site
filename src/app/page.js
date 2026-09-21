@@ -71,7 +71,7 @@ export default function Home() {
           <div className="text-[13px] font-bold tracking-wide text-[#e8a97a] bg-[#e8a97a]/10 py-1.5 px-4 rounded-full">
             {company.antiqueLicense}
           </div>
-          <h1 className="text-3xl md:text-[40px] leading-snug font-extrabold">
+          <h1 className="text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep">
             アダルトDVD・ブルーレイの
             <br />
             高価買取なら高買屋
@@ -106,8 +106,8 @@ export default function Home() {
             <div className="hidden md:block w-px self-stretch bg-[#ece6dc]" />
             <div className="text-left">
               <div className="text-[13px] text-[#5c554d]">定価の</div>
-              <div className="text-[56px] font-extrabold text-[#b3242b] leading-none">
-                最大50<span className="text-2xl">%</span>買取
+              <div className="text-4xl sm:text-5xl md:text-[56px] font-extrabold text-[#b3242b] leading-none break-keep whitespace-nowrap">
+                最大50<span className="text-lg sm:text-xl md:text-2xl">%</span>買取
               </div>
             </div>
           </div>
@@ -159,7 +159,8 @@ export default function Home() {
           </div>
 
           <div className="bg-white rounded-2xl overflow-hidden border border-[#ece6dc]">
-            <div className="overflow-x-auto">
+            {/* md以上: テーブル表示 */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full border-collapse text-sm">
                 <caption className="sr-only">
                   アダルトDVD・ブルーレイの買取価格の目安
@@ -197,6 +198,25 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
+
+            {/* md未満: カード表示 */}
+            <ul className="md:hidden divide-y divide-[#ece6dc]">
+              {priceTiers.map((tier) => (
+                <li key={tier.condition} className="p-5 flex flex-col gap-1.5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-bold text-[#26221e] break-keep min-w-0">
+                      {tier.condition}
+                    </span>
+                    <span className="font-extrabold text-[#b3242b] text-xl text-right shrink-0">
+                      {tier.rate}
+                    </span>
+                  </div>
+                  <span className="text-xs text-[#5c554d] break-keep">
+                    {tier.target}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="flex flex-col gap-1.5 text-center">
             <p className="text-xs text-[#726b5e]">
@@ -309,7 +329,7 @@ export default function Home() {
             <div className="text-xs font-bold text-[#e8a97a]">
               個人情報不要
             </div>
-            <div className="text-xl font-extrabold">
+            <div className="text-lg sm:text-xl font-extrabold break-keep">
               売るほどでもないDVDは無料回収します
             </div>
             <div className="text-[13px] text-[#cfc6bc]">
@@ -377,8 +397,10 @@ export default function Home() {
         className="w-full px-6 md:px-8 py-16 bg-gradient-to-b from-[#b3242b] to-[#8f1c22]"
       >
         <div className="max-w-[700px] mx-auto text-center flex flex-col items-center gap-4">
-          <h2 className="text-2xl font-extrabold text-white">
-            まずは無料査定からお気軽にどうぞ
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white break-keep">
+            まずは無料査定から
+            <br className="sm:hidden" />
+            お気軽にどうぞ
           </h2>
           <p className="text-[13px] text-white/85">
             5本以上から買取可能・査定は何度でも無料・お申し込みから最短当日でご連絡
