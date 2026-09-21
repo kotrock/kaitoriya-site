@@ -1,5 +1,6 @@
+import Image from "next/image";
 import PageHero from "@/components/PageHero";
-import { company } from "@/data/site";
+import { company, storeVisit } from "@/data/site";
 
 export const metadata = {
   title: "会社概要 | アダルトDVD高価買取の高買屋",
@@ -12,12 +13,26 @@ const rows = [
   ["事業内容", company.businessDesc],
   ["ホームページ", company.parentSite],
   ["代表取締役社長", company.representative],
+  ...(storeVisit.available
+    ? [["店舗への持ち込み", `対応可（${storeVisit.note}）`]]
+    : []),
 ];
 
 export default function AboutPage() {
   return (
     <>
       <PageHero eyebrow="ABOUT" title="会社概要" />
+      <section className="w-full px-6 md:px-8 pt-10">
+        <div className="max-w-[700px] mx-auto rounded-2xl overflow-hidden border border-[#ece6dc]">
+          <Image
+            src="/store-front.jpg"
+            alt="パラダイスBOX仙台店 外観"
+            width={1600}
+            height={744}
+            className="w-full h-auto"
+          />
+        </div>
+      </section>
       <section className="w-full px-6 md:px-8 py-14">
         <div className="max-w-[700px] mx-auto bg-white border border-[#ece6dc] rounded-2xl overflow-hidden">
           {rows.map(([label, value]) => (

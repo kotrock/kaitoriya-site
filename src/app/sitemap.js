@@ -1,4 +1,4 @@
-import { siteUrl } from "@/data/site";
+import { siteUrl, columns } from "@/data/site";
 
 const routes = [
   { path: "", changeFrequency: "weekly", priority: 1 },
@@ -7,6 +7,7 @@ const routes = [
   { path: "/faq", changeFrequency: "monthly", priority: 0.6 },
   { path: "/user-voice", changeFrequency: "monthly", priority: 0.6 },
   { path: "/results", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/column", changeFrequency: "weekly", priority: 0.6 },
   { path: "/about", changeFrequency: "yearly", priority: 0.4 },
   { path: "/terms-of-use", changeFrequency: "yearly", priority: 0.3 },
   { path: "/tokuhou", changeFrequency: "yearly", priority: 0.3 },
@@ -15,7 +16,12 @@ const routes = [
 
 export default function sitemap() {
   const lastModified = new Date();
-  return routes.map(({ path, changeFrequency, priority }) => ({
+  const columnRoutes = columns.map((c) => ({
+    path: `/column/${c.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+  return [...routes, ...columnRoutes].map(({ path, changeFrequency, priority }) => ({
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency,

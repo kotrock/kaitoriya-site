@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   labels,
   trustItems,
@@ -11,6 +12,7 @@ import {
   faqs,
   company,
   firstTimeBonus,
+  storeVisit,
 } from "@/data/site";
 import {
   TruckIcon,
@@ -83,12 +85,32 @@ export default function Home() {
         }}
       />
       {/* HERO */}
-      <section className="w-full bg-gradient-to-b from-[#201a17] to-[#2c231e] text-white">
-        <div className="max-w-[1200px] mx-auto px-6 md:px-8 pt-16 pb-14 flex flex-col items-center text-center gap-5">
+      <section className="relative w-full overflow-hidden text-white">
+        <div className="absolute inset-0 md:hidden">
+          <Image
+            src="/hero-background-mobile.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 hidden md:block">
+          <Image
+            src="/hero-background.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 pt-16 pb-14 flex flex-col items-center text-center gap-5">
           <div className="text-[13px] font-bold tracking-wide text-[#e8a97a] bg-[#e8a97a]/10 py-1.5 px-4 rounded-full">
             {company.antiqueLicense}
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep">
+          <h1 className="font-heading text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep">
             アダルトDVD・ブルーレイの
             <br />
             高価買取なら高買屋
@@ -123,7 +145,7 @@ export default function Home() {
             <div className="hidden md:block w-px self-stretch bg-[#ece6dc]" />
             <div className="text-left">
               <div className="text-[13px] text-[#5c554d]">定価の</div>
-              <div className="text-4xl sm:text-5xl md:text-[56px] font-extrabold text-[#b3242b] leading-none break-keep whitespace-nowrap">
+              <div className="font-heading text-4xl sm:text-5xl md:text-[56px] font-extrabold text-[#b3242b] leading-none break-keep whitespace-nowrap">
                 最大50<span className="text-lg sm:text-xl md:text-2xl">%</span>買取
               </div>
             </div>
@@ -161,10 +183,26 @@ export default function Home() {
       </section>
 
       {/* FIRST TIME CAMPAIGN */}
-      <section className="w-full px-6 md:px-8 py-4 bg-[#fbeceb] border-y border-[#f3d4d2]">
-        <p className="max-w-[1000px] mx-auto text-center text-sm md:text-base font-extrabold text-[#b3242b] break-keep">
-          初めてのご利用で査定額+{firstTimeBonus}キャンペーン実施中
-        </p>
+      <section className="w-full px-6 md:px-8 py-10">
+        <div className="max-w-[1000px] mx-auto bg-gradient-to-b from-[#b3242b] to-[#8f1c22] rounded-2xl p-6 flex flex-wrap items-center justify-center md:justify-between gap-4">
+          <p className="text-white font-extrabold leading-snug break-keep text-center md:text-left">
+            <span className="block text-base sm:text-lg">
+              初めてのご利用で
+            </span>
+            <span className="block text-2xl sm:text-3xl md:text-4xl mt-1">
+              査定額+{firstTimeBonus}
+            </span>
+          </p>
+          <div className="relative w-40 h-40 md:w-[220px] md:h-[220px] shrink-0">
+            <Image
+              src="/campaign-icon.png"
+              alt="初回キャンペーンのギフトイメージ"
+              fill
+              sizes="(min-width: 768px) 220px, 160px"
+              className="object-contain"
+            />
+          </div>
+        </div>
       </section>
 
       {/* PRICE TABLE */}
@@ -174,7 +212,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               PRICE LIST
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               買取価格の目安
             </h2>
             <p className="text-[13px] text-[#726b5e]">
@@ -263,7 +301,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               BONUS
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               まとめて売るとお得
             </h2>
             <p className="text-[13px] text-[#726b5e]">
@@ -281,7 +319,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               SIMULATOR
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               買取価格シミュレーター
             </h2>
             <p className="text-[13px] text-[#726b5e]">
@@ -299,7 +337,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               HOW IT WORKS
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               ご利用の流れ
             </h2>
           </div>
@@ -307,22 +345,89 @@ export default function Home() {
             {steps.map((step) => (
               <div
                 key={step.num}
-                className="flex flex-col gap-3 p-7 bg-[#f7f3ee] rounded-2xl"
+                className="flex flex-col bg-[#f7f3ee] rounded-2xl overflow-hidden"
               >
-                <div className="w-9 h-9 rounded-full bg-[#b3242b] text-white flex items-center justify-center font-extrabold text-sm">
-                  {step.num}
+                <div className="relative w-full h-48 sm:h-56 md:hidden">
+                  <Image
+                    src={`/flow-step${step.num}-wide.png`}
+                    alt={`ステップ${step.num}：${step.title}`}
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-left"
+                  />
                 </div>
-                <div className="text-base font-bold text-[#26221e]">
-                  {step.title}
+                <div className="relative w-full hidden md:block md:aspect-[1122/1402]">
+                  <Image
+                    src={`/flow-step${step.num}.png`}
+                    alt={`ステップ${step.num}：${step.title}`}
+                    fill
+                    sizes="33vw"
+                    className="object-cover"
+                  />
                 </div>
-                <div className="text-[13px] leading-loose text-[#5c554d]">
-                  {step.desc}
+                <div className="flex flex-col gap-3 p-7">
+                  <div className="w-7 h-7 rounded-full bg-[#b3242b] text-white flex items-center justify-center font-extrabold text-xs">
+                    {step.num}
+                  </div>
+                  <div className="text-base font-bold text-[#26221e]">
+                    {step.title}
+                  </div>
+                  <div className="text-[13px] leading-loose text-[#5c554d]">
+                    {step.desc}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* STORE VISIT */}
+      {storeVisit.available && (
+        <section className="w-full px-6 md:px-8 py-16 bg-[#26221e]">
+          <div className="max-w-[1000px] mx-auto grid md:grid-cols-2 gap-8 md:gap-10 items-center">
+            <div className="rounded-2xl overflow-hidden">
+              <Image
+                src="/store-front.jpg"
+                alt="パラダイスBOX仙台店 外観"
+                width={1200}
+                height={558}
+                className="w-full h-auto"
+              />
+            </div>
+            <div className="flex flex-col gap-3 text-white">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#e8a97a]">
+                <StoreIcon className="w-4 h-4" />
+                来店買取もOK
+              </div>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold break-keep">
+                仙台近郊の方は
+                <br />
+                店舗への直接持ち込みも可能です
+              </h2>
+              <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-1">
+                {["予約不要", "24時間受付", "その場で現金払い"].map((h) => (
+                  <span
+                    key={h}
+                    className="text-base sm:text-lg font-extrabold text-[#e8a97a]"
+                  >
+                    {h}
+                  </span>
+                ))}
+              </div>
+              <div className="text-[13px] text-[#cfc6bc]">
+                {company.address}
+              </div>
+              <a
+                href={`tel:${company.phoneTel}`}
+                className="mt-2 self-start bg-white text-[#26221e] text-sm font-bold py-3.5 px-6 rounded-full hover:bg-[#f7f3ee] whitespace-nowrap"
+              >
+                {company.phone}に電話する
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* VOICE */}
       <section id="voice" className="w-full px-6 md:px-8 py-16">
@@ -331,7 +436,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               VOICE
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               利用者の声
             </h2>
           </div>
@@ -379,7 +484,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               RESULTS
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               買取実績
             </h2>
             <p className="text-[13px] text-[#726b5e]">
@@ -434,7 +539,7 @@ export default function Home() {
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
               FAQ
             </div>
-            <h2 className="text-2xl md:text-[28px] text-[#26221e] font-bold">
+            <h2 className="font-heading text-2xl md:text-[28px] text-[#26221e] font-bold">
               よくある質問
             </h2>
           </div>
@@ -455,12 +560,18 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link
               href="/faq"
               className="text-sm font-bold text-[#b3242b] hover:underline"
             >
               よくある質問をもっと見る →
+            </Link>
+            <Link
+              href="/column"
+              className="text-sm font-bold text-[#5c554d] hover:text-[#b3242b] hover:underline"
+            >
+              買取コラムを見る →
             </Link>
           </div>
         </div>

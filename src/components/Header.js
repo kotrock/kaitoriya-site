@@ -9,7 +9,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white border-b border-[#ece6dc] sticky top-0 z-10">
+    <header className="w-full bg-white border-b border-[#ece6dc] sticky top-0 z-50">
       <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-4 flex items-center justify-between gap-4">
         <Link
           href="/"

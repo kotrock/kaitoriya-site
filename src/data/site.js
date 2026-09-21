@@ -24,6 +24,11 @@ export const company = {
   googleReviewUrl: "https://maps.app.goo.gl/D1C2TE1gmSmiPqrY9",
 };
 
+export const storeVisit = {
+  available: true,
+  note: "予約不要・24時間受付。査定額はその場で現金にてお支払いします。",
+};
+
 // 銀行振込・PayPay受け取りの条件。値を変更する場合はFAQ・利用規約・特定商取引法ページの記載も揃えて確認してください。
 export const payoutOptions = {
   bankFee: "880円",
@@ -44,6 +49,7 @@ export const nav = [
 export const footerLinks = [
   { href: "/about", label: "会社概要" },
   { href: "/results", label: "買取実績" },
+  { href: "/column", label: "買取コラム" },
   { href: "/terms-of-use", label: "利用規約" },
   { href: "/tokuhou", label: "特定商取引法" },
   { href: "/privacy-policy", label: "プライバシーポリシー" },
@@ -167,6 +173,17 @@ export const resultsSummary = {
   totalCount: "12,480点",
   totalAmount: "8,240,000円",
 };
+
+// 買取コラム。記事本文は src/app/column/[slug]/page.js に実装します。
+export const columns = [
+  {
+    slug: "label-souba",
+    title: "レーベル別の買取相場",
+    excerpt:
+      "エスワン・ムーディーズ・マドンナ・FALENOなど人気レーベルの買取相場の傾向と、高く売れやすい条件を解説します。",
+    date: "2026-09-21",
+  },
+];
 
 export const faqs = [
   {

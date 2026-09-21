@@ -1,7 +1,15 @@
 import "./globals.css";
+import { Zen_Kaku_Gothic_New } from "next/font/google";
 import AgeGate from "@/components/AgeGate";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+
+const zenKakuGothicNew = Zen_Kaku_Gothic_New({
+  weight: ["700", "900"],
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 export const metadata = {
   title: "アダルトDVD買取 最大50%〜｜査定無料・送料無料の高買屋",
@@ -11,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ja" className="h-full antialiased">
+    <html lang="ja" className={`h-full antialiased ${zenKakuGothicNew.variable}`}>
       <body className="min-h-full flex flex-col font-sans bg-[#f7f3ee] text-[#26221e]">
         <AgeGate />
         <Header />
