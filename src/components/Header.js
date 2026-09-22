@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { nav, company } from "@/data/site";
 import { PhoneIcon } from "@/components/Icons";
 
@@ -16,14 +17,18 @@ export default function Header() {
           className="flex items-center gap-2.5 shrink-0"
           onClick={() => setOpen(false)}
         >
-          <div className="w-10 h-10 rounded-lg bg-[#b3242b] text-white flex items-center justify-center font-extrabold text-sm">
-            高
-          </div>
+          <Image
+            src="/favicon-source-v2.png"
+            alt="高買屋"
+            width={40}
+            height={40}
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-full"
+          />
           <div>
-            <div className="text-lg font-extrabold text-[#26221e] tracking-tight">
+            <div className="font-heading text-base sm:text-lg font-extrabold text-[#26221e] tracking-tight">
               高買屋
             </div>
-            <div className="text-[10px] text-[#726b5e] tracking-wide">
+            <div className="hidden sm:block text-[10px] text-[#726b5e] tracking-wide">
               アダルトDVD高価買取専門店
             </div>
           </div>

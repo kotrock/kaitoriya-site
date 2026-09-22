@@ -1,15 +1,22 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions } from "@/data/site";
 
-const STEPS = ["お客様情報", "詳細", "確認"];
+const STEPS = ["コース選択", "お客様情報", "詳細", "確認"];
 
-const assessmentLabels = {
-  speed: "スピード買取（仮査定なし）",
-  preview: "仮査定申請（仮査定あり）",
+const courseCopy = {
+  speed: {
+    label: "スピード買取（仮査定なし）",
+    desc: "画像添付不要。到着後すぐ査定・お振込み。査定額に関わらずキャンセル不可です。",
+  },
+  provisional: {
+    label: "仮査定申請（仮査定あり）",
+    desc: "本数・商品内容・画像を送付。店舗で仮査定後にご連絡、内容にご納得いただけたら発送してください。",
+  },
 };
 
 const paymentLabels = {
@@ -17,16 +24,24 @@ const paymentLabels = {
   paypay: `PayPay受け取り（${payoutOptions.paypayBonus}プラス）`,
 };
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
 export default function ApplicationForm() {
-  const [assessmentType, setAssessmentType] = useState("speed");
+  const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
   const [paymentMethod, setPaymentMethod] = useState("bank");
+  const [images, setImages] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [errorMessage, setErrorMessage] = useState("");
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
   const cardRef = useRef(null);
   const formRef = useRef(null);
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
+  const step2Ref = useRef(null);
+
+  const stepRefs = [step0Ref, step1Ref, step2Ref];
 
   function validateStep(el) {
     if (!el) return true;
@@ -40,12 +55,30 @@ export default function ApplicationForm() {
     return true;
   }
 
+  function handleImagesChange(e) {
+    const input = e.target;
+    const files = Array.from(input.files || []);
+    const invalid = files.find(
+      (f) => !ALLOWED_TYPES.includes(f.type) || f.size > MAX_FILE_SIZE
+    );
+    if (invalid) {
+      input.setCustomValidity(
+        `「${invalid.name}」はjpg/png・10MB以内のファイルにしてください。`
+      );
+    } else {
+      input.setCustomValidity("");
+    }
+    setImages(files);
+  }
+
   function goNext() {
-    const currentEl = step === 0 ? step0Ref.current : step1Ref.current;
+    const currentEl = stepRefs[step]?.current;
     if (!validateStep(currentEl)) return;
-    if (step === 1) {
+    if (step === 2) {
       const data = new FormData(formRef.current);
-      setSummary(Object.fromEntries(data.entries()));
+      const entries = Object.fromEntries(data.entries());
+      delete entries.images;
+      setSummary(entries);
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
     window.scrollTo({ top: cardRef.current?.offsetTop - 80, behavior: "smooth" });
@@ -59,21 +92,22 @@ export default function ApplicationForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage("");
 
     const formData = new FormData(e.target);
-    formData.append(
-      "access_key",
-      process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
-    );
-    formData.append("subject", "【高買屋】買取お申込みがありました");
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("/api/application", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      setStatus(data.success ? "sent" : "error");
+      if (data.success) {
+        setStatus("sent");
+      } else {
+        setStatus("error");
+        setErrorMessage(data.error || "");
+      }
     } catch {
       setStatus("error");
     }
@@ -87,7 +121,9 @@ export default function ApplicationForm() {
           お申し込みを受け付けました
         </h3>
         <p className="text-sm text-[#5c554d]">
-          最短当日〜2日程度で担当よりご連絡いたします。段ボールが届き次第、商品をご準備ください。
+          {course === "provisional"
+            ? "店舗にて仮査定を行い、最短当日〜2日程度でご連絡いたします。内容にご納得いただけましたら発送手続きをご案内します。"
+            : "最短翌日にご連絡・お振込みいたします。段ボールが届き次第、商品をご準備ください。"}
         </p>
       </div>
     );
@@ -111,9 +147,49 @@ export default function ApplicationForm() {
           autoComplete="off"
         />
 
+        {/* STEP 0: コース選択 */}
         <div
           ref={step0Ref}
-          className={step === 0 ? "flex flex-col gap-5" : "hidden"}
+          className={step === 0 ? "flex flex-col gap-4" : "hidden"}
+        >
+          <h3 className="text-base font-bold text-[#26221e]">
+            コースを選択してください
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {Object.entries(courseCopy).map(([value, c]) => (
+              <label
+                key={value}
+                className={
+                  "cursor-pointer border-2 rounded-2xl p-5 flex flex-col gap-2 transition-colors " +
+                  (course === value
+                    ? "border-[#b3242b] bg-[#fbeceb]"
+                    : "border-[#ece6dc] hover:border-[#d8d2c8]")
+                }
+              >
+                <input
+                  type="radio"
+                  name="course"
+                  value={value}
+                  required
+                  className="sr-only"
+                  checked={course === value}
+                  onChange={() => setCourse(value)}
+                />
+                <span className="text-base font-bold text-[#26221e]">
+                  {c.label}
+                </span>
+                <span className="text-xs text-[#726b5e] leading-relaxed">
+                  {c.desc}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* STEP 1: お客様情報（コースにより一部項目が変わる） */}
+        <div
+          ref={step1Ref}
+          className={step === 1 ? "flex flex-col gap-5" : "hidden"}
         >
           <h3 className="text-base font-bold text-[#26221e]">
             お客様情報
@@ -140,52 +216,54 @@ export default function ApplicationForm() {
               className={inputCls}
             />
           </Field>
+
+          {course === "provisional" && (
+            <>
+              <Field
+                label="買取商品の内容"
+                required
+                hint="レーベル名・タイトルなど、わかる範囲でご記入ください。"
+              >
+                <textarea
+                  name="product_details"
+                  rows={4}
+                  required
+                  className={inputCls}
+                />
+              </Field>
+              <Field
+                label="商品の画像"
+                required
+                hint="jpg/png形式、1枚あたり10MBまで。複数枚選択できます。"
+              >
+                <input
+                  type="file"
+                  name="images"
+                  accept="image/jpeg,image/png"
+                  multiple
+                  required
+                  onChange={handleImagesChange}
+                  className={inputCls}
+                />
+              </Field>
+              {images.length > 0 && (
+                <ul className="text-xs text-[#5c554d] flex flex-col gap-1">
+                  {images.map((f, i) => (
+                    <li key={i}>
+                      {f.name}（{(f.size / 1024 / 1024).toFixed(1)}MB）
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
         </div>
 
+        {/* STEP 2: 詳細（段ボール・お支払い方法。両コース共通） */}
         <div
-          ref={step1Ref}
-          className={step === 1 ? "flex flex-col gap-8" : "hidden"}
+          ref={step2Ref}
+          className={step === 2 ? "flex flex-col gap-8" : "hidden"}
         >
-          <div className="flex flex-col gap-4">
-            <h3 className="text-base font-bold text-[#26221e]">査定方法</h3>
-            <div className="flex flex-col gap-3 text-sm text-[#26221e]">
-              <label className="flex items-start gap-2">
-                <input
-                  type="radio"
-                  name="assessment_type"
-                  value={assessmentLabels.speed}
-                  className="mt-1"
-                  checked={assessmentType === "speed"}
-                  onChange={() => setAssessmentType("speed")}
-                />
-                <span>
-                  <span className="font-semibold">スピード買取（仮査定なし）</span>
-                  <br />
-                  <span className="text-xs text-[#726b5e]">
-                    お急ぎの方におすすめ。査定額の変動はございません。
-                  </span>
-                </span>
-              </label>
-              <label className="flex items-start gap-2">
-                <input
-                  type="radio"
-                  name="assessment_type"
-                  value={assessmentLabels.preview}
-                  className="mt-1"
-                  checked={assessmentType === "preview"}
-                  onChange={() => setAssessmentType("preview")}
-                />
-                <span>
-                  <span className="font-semibold">仮査定申請（仮査定あり）</span>
-                  <br />
-                  <span className="text-xs text-[#726b5e]">
-                    発送前に概算金額をお知らせします。ご納得いただけない場合はキャンセルも可能です。
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-bold text-[#26221e]">
               発送用の段ボール
@@ -211,37 +289,55 @@ export default function ApplicationForm() {
               お支払い方法
             </h3>
             <div className="flex flex-col gap-3 text-sm text-[#26221e]">
-              <label className="flex items-start gap-2">
-                <input
-                  type="radio"
-                  name="payment_method"
-                  value={paymentLabels.bank}
-                  className="mt-1"
-                  checked={paymentMethod === "bank"}
-                  onChange={() => setPaymentMethod("bank")}
+              <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
+                <Image
+                  src="/payment-bank.png"
+                  alt=""
+                  width={96}
+                  height={96}
+                  className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
                 />
-                <span>
-                  <span className="font-semibold">{paymentLabels.bank}</span>
-                  <br />
-                  <span className="text-xs text-[#726b5e]">
-                    指定の口座へお振込みいたします。
+                <span className="flex items-start gap-2 flex-1">
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value={paymentLabels.bank}
+                    className="mt-1"
+                    checked={paymentMethod === "bank"}
+                    onChange={() => setPaymentMethod("bank")}
+                  />
+                  <span>
+                    <span className="font-semibold">{paymentLabels.bank}</span>
+                    <br />
+                    <span className="text-xs text-[#726b5e]">
+                      指定の口座へお振込みいたします。
+                    </span>
                   </span>
                 </span>
               </label>
-              <label className="flex items-start gap-2">
-                <input
-                  type="radio"
-                  name="payment_method"
-                  value={paymentLabels.paypay}
-                  className="mt-1"
-                  checked={paymentMethod === "paypay"}
-                  onChange={() => setPaymentMethod("paypay")}
+              <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
+                <Image
+                  src="/payment-paypay.png"
+                  alt=""
+                  width={96}
+                  height={96}
+                  className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
                 />
-                <span>
-                  <span className="font-semibold">{paymentLabels.paypay}</span>
-                  <br />
-                  <span className="text-xs text-[#726b5e]">
-                    振込手数料がかからず、逆にボーナスを上乗せしてお支払いします。
+                <span className="flex items-start gap-2 flex-1">
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value={paymentLabels.paypay}
+                    className="mt-1"
+                    checked={paymentMethod === "paypay"}
+                    onChange={() => setPaymentMethod("paypay")}
+                  />
+                  <span>
+                    <span className="font-semibold">{paymentLabels.paypay}</span>
+                    <br />
+                    <span className="text-xs text-[#726b5e]">
+                      振込手数料がかからず、逆にボーナスを上乗せしてお支払いします。
+                    </span>
                   </span>
                 </span>
               </label>
@@ -249,19 +345,44 @@ export default function ApplicationForm() {
           </div>
         </div>
 
-        <div
-          className={step === 2 ? "flex flex-col gap-5" : "hidden"}
-        >
+        {/* STEP 3: 確認 */}
+        <div className={step === 3 ? "flex flex-col gap-5" : "hidden"}>
           <h3 className="text-base font-bold text-[#26221e]">内容確認</h3>
           <div className="border border-[#ece6dc] rounded-xl px-5">
+            <SummaryRow
+              label="コース"
+              value={course ? courseCopy[course]?.label : ""}
+            />
             <SummaryRow label="お名前" value={summary.name} />
             <SummaryRow label="メールアドレス" value={summary.email} />
             <SummaryRow label="電話番号" value={summary.phone} />
             <SummaryRow label="買取希望商品の本数" value={summary.quantity} />
-            <SummaryRow label="査定方法" value={summary.assessment_type} />
+            {course === "provisional" && (
+              <>
+                <SummaryRow
+                  label="買取商品の内容"
+                  value={summary.product_details}
+                />
+                <SummaryRow
+                  label="添付画像"
+                  value={
+                    images.length > 0
+                      ? `${images.length}枚（${images.map((f) => f.name).join("、")}）`
+                      : ""
+                  }
+                />
+              </>
+            )}
             <SummaryRow label="発送用の段ボール" value={summary.box_option} />
             <SummaryRow label="お支払い方法" value={summary.payment_method} />
           </div>
+
+          {course === "speed" && (
+            <label className="flex items-start gap-2 text-xs text-[#5c554d]">
+              <input type="checkbox" required className="mt-0.5" />
+              査定額に関わらずキャンセルはできないことに同意します。
+            </label>
+          )}
           <label className="flex items-start gap-2 text-xs text-[#5c554d]">
             <input type="checkbox" required className="mt-0.5" />
             利用規約・プライバシーポリシーに同意の上、この内容で申し込みます。
@@ -270,7 +391,8 @@ export default function ApplicationForm() {
 
         {status === "error" && (
           <p className="text-sm text-[#b3242b]">
-            送信に失敗しました。お手数ですがお電話(022-343-1588)でもお問い合わせいただけます。
+            {errorMessage ||
+              "送信に失敗しました。お手数ですがお電話(022-343-1588)でもお問い合わせいただけます。"}
           </p>
         )}
 
@@ -298,7 +420,7 @@ export default function ApplicationForm() {
               disabled={status === "sending"}
               className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
             >
-              {status === "sending" ? "送信中…" : "この内容で無料査定を申し込む"}
+              {status === "sending" ? "送信中…" : "この内容で申し込む"}
             </button>
           )}
         </div>
