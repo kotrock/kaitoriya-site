@@ -1,6 +1,5 @@
 import PageHero from "@/components/PageHero";
 import RecycleForm from "@/components/RecycleForm";
-import LineBanner from "@/components/LineBanner";
 import { company } from "@/data/site";
 
 export const metadata = {
@@ -34,12 +33,6 @@ export default function RecyclePage() {
       </section>
 
       <RecycleForm />
-
-      <section className="w-full px-6 md:px-8 pb-12">
-        <div className="max-w-[700px] mx-auto">
-          <LineBanner />
-        </div>
-      </section>
 
       <section className="w-full px-6 md:px-8 pb-16">
         <div className="max-w-[700px] mx-auto bg-white border border-[#ece6dc] rounded-2xl p-8 flex flex-col gap-3">

@@ -16,7 +16,6 @@ export default function AgeGate() {
     // One-time read of client-only storage to decide whether to show the
     // gate; this must run after mount since localStorage isn't available
     // during server rendering, so a single setState here is intentional.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     let next = "ask";
     try {
       if (window.localStorage.getItem(STORAGE_KEY) === "1") {

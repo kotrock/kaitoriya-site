@@ -3,6 +3,8 @@ import { company, payoutOptions } from "@/data/site";
 
 export const metadata = {
   title: "特定商取引法 | アダルトDVD高価買取の高買屋",
+  description:
+    "高買屋の特定商取引法に基づく表記です。社名・所在地・連絡先・送料・お支払い方法・キャンセルについてご案内します。",
 };
 
 const rows = [
@@ -17,6 +19,10 @@ const rows = [
   [
     "お支払い",
     `銀行振込　${company.bank}（振込手数料${payoutOptions.bankFee}）／PayPay受け取り（${payoutOptions.paypayBonus}プラスでお支払い）`,
+  ],
+  [
+    "キャンセルについて",
+    "スピード買取（仮査定なし）は査定額に関わらずキャンセルいただけません。仮査定申請（仮査定あり）は、仮査定結果にご納得いただけない場合、発送前であればキャンセル可能です。発送後のキャンセル・返送については返送料をお客様にご負担いただきます。",
   ],
 ];
 

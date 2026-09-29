@@ -183,26 +183,6 @@ export function StoreIcon({ className = "w-6 h-6" }) {
   );
 }
 
-export function LineIcon({ className = "w-6 h-6" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M21 11.2c0-4.3-4.3-7.7-9-7.7s-9 3.4-9 7.7c0 3.8 3.4 7 8 7.6.3.1.7.2.8.6.1.3.1.7 0 1l-.2 1c0 .3-.2 1 .9.6a33 33 0 0 0 5.2-3.9c1.6-1.5 3.3-3.4 3.3-6.9z" />
-      <path d="M9 9.5v4.2" />
-      <path d="M12 9.5v4.2l2.4-4.2v4.2" />
-      <path d="M17.5 9.5v4.2h1.8" />
-    </svg>
-  );
-}
-
 export function StarRating({ count = 5, className = "w-4 h-4" }) {
   return (
     <div className="flex gap-0.5" role="img" aria-label={`評価 ${count}段階中${count}`}>

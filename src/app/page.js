@@ -15,29 +15,14 @@ import {
   storeVisit,
 } from "@/data/site";
 import {
-  TruckIcon,
-  SearchIcon,
-  BoxIcon,
-  LockIcon,
-  CalendarIcon,
   StoreIcon,
   StarRating,
 } from "@/components/Icons";
-import LineBanner from "@/components/LineBanner";
 import PriceSimulator from "@/components/PriceSimulator";
 import ResultsSummary from "@/components/ResultsSummary";
 import ResultsTable from "@/components/ResultsTable";
 import BonusTiers from "@/components/BonusTiers";
 import { siteUrl } from "@/data/site";
-
-const trustIcons = {
-  truck: TruckIcon,
-  search: SearchIcon,
-  box: BoxIcon,
-  lock: LockIcon,
-  calendar: CalendarIcon,
-  store: StoreIcon,
-};
 
 export default function Home() {
   const [, addressRegion, addressLocality] =
@@ -85,32 +70,18 @@ export default function Home() {
         }}
       />
       {/* HERO */}
-      <section className="relative w-full overflow-hidden text-white">
-        <div className="absolute inset-0 md:hidden">
-          <Image
-            src="/hero-background-mobile.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 hidden md:block">
-          <Image
-            src="/hero-background.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
+      <section className="w-full text-white bg-[url('/hero-background-mobile.png')] md:bg-[url('/hero-background.png')] bg-cover bg-center bg-no-repeat">
         <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8 pt-16 pb-14 flex flex-col items-center text-center gap-5">
           <div className="text-[13px] font-bold tracking-wide text-[#e8a97a] bg-[#e8a97a]/10 py-1.5 px-4 rounded-full">
             {company.antiqueLicense}
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep">
+          <Link
+            href="/campaign"
+            className="text-xs text-white/70 underline hover:text-white"
+          >
+            ※初回1,000円プラスの詳細はこちら
+          </Link>
+          <h1 className="font-heading text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep text-white">
             アダルトDVD・ブルーレイの
             <br />
             高価買取なら高買屋
@@ -121,7 +92,7 @@ export default function Home() {
           <div className="flex gap-3.5 mt-2 flex-wrap justify-center">
             <Link
               href="/application"
-              className="bg-[#b3242b] text-white text-[15px] font-bold py-4 px-8 rounded-full hover:bg-[#8f1c22] transition-colors"
+              className="bg-[#b3242b] text-white text-[15px] font-bold py-4 px-8 rounded-full hover:bg-[#8f1c22] transition-colors shadow-[0_8px_24px_rgba(179,36,43,0.35)]"
             >
               今すぐ無料査定を申し込む
             </Link>
@@ -133,7 +104,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="w-full max-w-[880px] bg-white rounded-2xl p-8 mt-6 flex items-center gap-8 text-[#26221e] flex-wrap justify-center">
+          <div className="w-full max-w-[880px] bg-white rounded-2xl p-8 md:p-10 mt-6 flex items-center gap-8 text-[#26221e] flex-wrap justify-center shadow-[0_16px_40px_rgba(179,36,43,0.15)] border-2 border-[#b3242b]/20">
             <div className="text-left shrink-0">
               <div className="text-[13px] font-bold text-[#b3242b]">
                 対象レーベル新作
@@ -145,8 +116,8 @@ export default function Home() {
             <div className="hidden md:block w-px self-stretch bg-[#ece6dc]" />
             <div className="text-left">
               <div className="text-[13px] text-[#5c554d]">定価の</div>
-              <div className="font-heading text-4xl sm:text-5xl md:text-[56px] font-extrabold text-[#b3242b] leading-none break-keep whitespace-nowrap">
-                最大50<span className="text-lg sm:text-xl md:text-2xl">%</span>買取
+              <div className="font-heading text-4xl sm:text-5xl md:text-[64px] font-extrabold text-[#b3242b] leading-none break-keep whitespace-nowrap">
+                最大50<span className="text-lg sm:text-xl md:text-3xl">%</span>買取
               </div>
             </div>
           </div>
@@ -167,18 +138,21 @@ export default function Home() {
       {/* TRUST BAR */}
       <section className="w-full bg-white border-b border-[#ece6dc]">
         <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-7 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-          {trustItems.map((item) => {
-            const Icon = trustIcons[item.icon];
-            return (
-              <div key={item.title} className="text-center flex flex-col items-center gap-1.5">
-                <Icon className="w-7 h-7 text-[#b3242b]" />
-                <div className="text-sm font-bold text-[#26221e]">
-                  {item.title}
-                </div>
-                <div className="text-xs text-[#726b5e]">{item.desc}</div>
+          {trustItems.map((item) => (
+            <div key={item.title} className="text-center flex flex-col items-center gap-1.5">
+              <Image
+                src={item.image}
+                alt=""
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain"
+              />
+              <div className="text-sm font-bold text-[#26221e]">
+                {item.title}
               </div>
-            );
-          })}
+              <div className="text-xs text-[#726b5e]">{item.desc}</div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -192,6 +166,12 @@ export default function Home() {
             <span className="block text-2xl sm:text-3xl md:text-4xl mt-1">
               査定額+{firstTimeBonus}
             </span>
+            <Link
+              href="/campaign"
+              className="text-xs text-white/75 underline hover:text-white mt-2 inline-block"
+            >
+              適用条件を見る →
+            </Link>
           </p>
           <div className="relative w-40 h-40 md:w-[220px] md:h-[220px] shrink-0">
             <Image
@@ -206,7 +186,7 @@ export default function Home() {
       </section>
 
       {/* PRICE TABLE */}
-      <section id="price" className="w-full px-6 md:px-8 py-18 py-16">
+      <section id="price" className="w-full px-6 md:px-8 py-16">
         <div className="max-w-[1000px] mx-auto flex flex-col gap-8">
           <div className="text-center flex flex-col gap-2.5">
             <div className="text-[13px] font-bold text-[#b3242b] tracking-wide">
@@ -323,7 +303,7 @@ export default function Home() {
               買取価格シミュレーター
             </h2>
             <p className="text-[13px] text-[#726b5e]">
-              本数と状態を選ぶだけで、概算の買取金額をすぐに確認できます。
+              状態ごとの本数を入力するだけで、概算の買取金額をすぐに確認できます。
             </p>
           </div>
           <PriceSimulator />
@@ -508,27 +488,36 @@ export default function Home() {
       </section>
 
       {/* RECYCLE BANNER */}
-      <section className="w-full px-6 md:px-8 py-14 bg-[#26221e]">
-        <div className="max-w-[900px] mx-auto flex items-center justify-between gap-6 flex-wrap">
-          <div className="flex flex-col gap-2 text-white">
-            <div className="text-xs font-bold text-[#e8a97a]">
+      <section className="w-full px-6 md:px-8 py-14 bg-[#f7f3ee]">
+        <div className="max-w-[900px] mx-auto flex items-center justify-between gap-8 flex-wrap sm:flex-nowrap">
+          <div className="flex flex-col gap-2 flex-1 min-w-[220px]">
+            <div className="text-xs font-bold text-[#b3242b]">
               個人情報不要
             </div>
-            <div className="text-lg sm:text-xl font-extrabold break-keep">
+            <div className="text-lg sm:text-xl font-extrabold text-[#26221e] break-keep">
               売るほどでもないDVDは
               <br className="sm:hidden" />
               無料回収します
             </div>
-            <div className="text-[13px] text-[#cfc6bc]">
+            <div className="text-[13px] text-[#5c554d]">
               段ボール5箱まで無料提供・送料無料・何点でもOK
             </div>
+            <Link
+              href="/recycle"
+              className="bg-[#b3242b] text-white text-sm font-bold py-3.5 px-6 rounded-full shrink-0 hover:bg-[#8f1c22] transition-colors self-start mt-1"
+            >
+              無料回収を申し込む
+            </Link>
           </div>
-          <Link
-            href="/recycle"
-            className="bg-white text-[#26221e] text-sm font-bold py-3.5 px-6 rounded-full shrink-0 hover:bg-[#f7f3ee]"
-          >
-            無料回収を申し込む
-          </Link>
+          <div className="w-28 h-[75px] sm:w-40 sm:h-[107px] md:w-48 md:h-32 shrink-0 mx-auto sm:mx-0">
+            <Image
+              src="/recycle-illustration.svg"
+              alt=""
+              width={300}
+              height={200}
+              className="w-full h-full object-contain"
+            />
+          </div>
         </div>
       </section>
 
@@ -574,13 +563,6 @@ export default function Home() {
               買取コラムを見る →
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* LINE CTA */}
-      <section className="w-full px-6 md:px-8 py-12 bg-white border-t border-[#ece6dc]">
-        <div className="max-w-[900px] mx-auto">
-          <LineBanner />
         </div>
       </section>
 

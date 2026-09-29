@@ -2,6 +2,8 @@ import PageHero from "@/components/PageHero";
 
 export const metadata = {
   title: "利用規約 | アダルトDVD高価買取の高買屋",
+  description:
+    "高買屋の買取サービスをご利用いただくにあたっての利用規約です。お申し込み・査定・お支払い・キャンセル等に関する規定をご確認ください。",
 };
 
 const sections = [

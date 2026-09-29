@@ -14,13 +14,11 @@ export const company = {
   phone: "022-343-1588",
   phoneTel: "0223431588",
   phoneHours: "9時〜18時",
-  email: "pbox_sendai@yahoo.co.jp",
+  email: "pbkaitori@gmail.com",
   businessDesc: "本・DVD・雑貨の販売",
   parentSite: "https://www.paradise-box.com/",
   antiqueLicense: "宮城県公安委員会許可第221240000756号",
   bank: "七十七銀行より指定の口座へお振込み",
-  // TODO: 実際のLINE公式アカウントの友だち追加URLに差し替えてください
-  lineUrl: "https://lin.ee/xxxxxxx",
   googleReviewUrl: "https://maps.app.goo.gl/D1C2TE1gmSmiPqrY9",
 };
 
@@ -61,12 +59,12 @@ export const labels = [
 ];
 
 export const trustItems = [
-  { icon: "truck", title: "送料無料", desc: "全国一律（離島等除く）" },
-  { icon: "search", title: "査定無料", desc: "何本でも0円で査定" },
-  { icon: "box", title: "段ボール無料", desc: "5箱まで無料提供" },
-  { icon: "lock", title: "個人情報厳重管理", desc: "梱包は中身が見えない配慮" },
-  { icon: "calendar", title: `創業${company.founded.match(/^\d+年/)[0]}`, desc: "古物商許可の老舗店舗" },
-  { icon: "store", title: "実店舗運営", desc: "パラダイスＢＯＸ仙台店" },
+  { image: "/icon-shipping-box.png", title: "送料無料", desc: "全国一律（離島等除く）" },
+  { image: "/icon-appraisal.png", title: "査定無料", desc: "何本でも0円で査定" },
+  { image: "/icon-box-supply.png", title: "段ボール無料", desc: "5箱まで無料提供" },
+  { image: "/icon-privacy-lock.png", title: "個人情報厳重管理", desc: "梱包は中身が見えない配慮" },
+  { image: "/icon-since1988.svg", title: `創業${company.founded.match(/^\d+年/)[0]}`, desc: "古物商許可の老舗店舗" },
+  { image: "/icon-storefront.svg", title: "実店舗運営", desc: "パラダイスＢＯＸ仙台店" },
 ];
 
 export const priceTiers = [
@@ -114,8 +112,10 @@ export const priceTiers = [
   },
 ];
 
-// シミュレーター用の仮の平均定価（1本あたり）。商品ごとの正確な定価データがないための概算値。
-export const avgUnitPrice = 4000;
+// シミュレーター用の仮の定価幅（1本あたり）。商品ごとの正確な定価データがないための概算値。
+// 概算の下限はAVG_PRICE_LOW×買取率下限、上限はAVG_PRICE_HIGH×買取率上限で算出する。
+export const AVG_PRICE_LOW = 3180;
+export const AVG_PRICE_HIGH = 4180;
 
 // 数量ボーナス。Aランクは新作系、Bランクは旧作・ディスクのみが対象。
 export const bonusTiers = {
@@ -139,7 +139,7 @@ export const bonusTiers = {
 };
 
 export const steps = [
-  { num: "1", title: "お申し込み", desc: "フォームからお客様情報と商品情報をご入力ください。仮査定の希望有無も選べます。" },
+  { num: "1", title: "お申し込み", desc: "フォームからお客様情報と商品情報をご入力ください。本人確認書類の写真もあわせてご提出いただきます。仮査定の希望有無も選べます。" },
   { num: "2", title: "梱包・発送", desc: "無料の段ボールに詰めて発送するだけ。着払いで送料もかかりません。" },
   {
     num: "3",
@@ -192,7 +192,7 @@ export const faqs = [
   },
   {
     q: "買取をする際に必要なものは何ですか？",
-    a: "身分証明書（運転免許証、健康保険証、マイナンバーカードなど）が必要です。郵送時に提示して頂く際はコピーで、画像を添付できる方は両面の画像添付で提出をお願いしております。",
+    a: "ご本人様の顔写真と、身分証明書（運転免許証、健康保険証、マイナンバーカードなど）の写真が必要です。身分証明書は、真上からではなく少し斜めにしてカードの厚みが写るように撮影してください（平面的なコピーと区別するためです）。いずれもお申し込みフォームからそのままご提出いただけますので、書類の郵送は不要です。",
   },
   {
     q: "査定にお金はかかりますか？",
@@ -245,5 +245,9 @@ export const faqs = [
   {
     q: "お支払い方法を選べますか？",
     a: "銀行振込とPayPay受け取りからお選びいただけます。銀行振込は振込手数料880円を頂戴しておりますが、PayPay受け取りの場合は逆に300円プラスしてお支払いします。",
+  },
+  {
+    q: "「初めての方は査定額+1,000円」とはどういうキャンペーンですか？",
+    a: "当社を初めてご利用いただく方が、5点（本）以上をまとめてご発送いただいた場合、査定額に1,000円を上乗せするキャンペーンです。ディスクのみの商品やレンタル落ち品は対象外となります。詳しい条件はキャンペーンページをご確認ください。",
   },
 ];

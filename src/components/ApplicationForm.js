@@ -31,6 +31,8 @@ export default function ApplicationForm() {
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
   const [paymentMethod, setPaymentMethod] = useState("bank");
   const [images, setImages] = useState([]);
+  const [selfiePhoto, setSelfiePhoto] = useState(null);
+  const [idPhoto, setIdPhoto] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorMessage, setErrorMessage] = useState("");
   const [step, setStep] = useState(0);
@@ -71,6 +73,19 @@ export default function ApplicationForm() {
     setImages(files);
   }
 
+  function handleSingleFileChange(e, setPhoto) {
+    const input = e.target;
+    const file = input.files?.[0] || null;
+    if (file && (!ALLOWED_TYPES.includes(file.type) || file.size > MAX_FILE_SIZE)) {
+      input.setCustomValidity(
+        `「${file.name}」はjpg/png・10MB以内のファイルにしてください。`
+      );
+    } else {
+      input.setCustomValidity("");
+    }
+    setPhoto(file);
+  }
+
   function goNext() {
     const currentEl = stepRefs[step]?.current;
     if (!validateStep(currentEl)) return;
@@ -78,6 +93,8 @@ export default function ApplicationForm() {
       const data = new FormData(formRef.current);
       const entries = Object.fromEntries(data.entries());
       delete entries.images;
+      delete entries.selfie_photo;
+      delete entries.id_document_photo;
       setSummary(entries);
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -203,31 +220,138 @@ export default function ApplicationForm() {
           <Field label="電話番号" required>
             <input type="tel" name="phone" required className={inputCls} />
           </Field>
-          <Field
-            label="買取希望商品の本数"
-            hint="アダルトDVD・ブルーレイは5本以上、コミックのみの場合は10冊以上から買取可能です。"
-            required
-          >
-            <input
-              type="number"
-              name="quantity"
-              min={1}
+          {course === "provisional" ? (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-semibold text-[#26221e]">
+                買取点数の内訳
+              </span>
+              <span className="text-xs text-[#726b5e]">
+                アダルトDVD・ブルーレイは5本以上、コミックのみの場合は10冊以上から買取可能です。わかる範囲でご記入ください（空欄可）。
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-[#5c554d]">
+                    DVD本数
+                  </span>
+                  <input
+                    type="number"
+                    name="dvd_count"
+                    min={0}
+                    className={inputCls}
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-[#5c554d]">
+                    ブルーレイ本数
+                  </span>
+                  <input
+                    type="number"
+                    name="bd_count"
+                    min={0}
+                    className={inputCls}
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-[#5c554d]">
+                    コミック冊数
+                  </span>
+                  <input
+                    type="number"
+                    name="comic_count"
+                    min={0}
+                    className={inputCls}
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-[#5c554d]">
+                    その他（点数）
+                  </span>
+                  <input
+                    type="number"
+                    name="other_count"
+                    min={0}
+                    className={inputCls}
+                  />
+                </label>
+              </div>
+            </div>
+          ) : (
+            <Field
+              label="買取希望商品の本数"
+              hint="アダルトDVD・ブルーレイは5本以上、コミックのみの場合は10冊以上から買取可能です。"
               required
-              className={inputCls}
-            />
-          </Field>
+            >
+              <input
+                type="number"
+                name="quantity"
+                min={1}
+                required
+                className={inputCls}
+              />
+            </Field>
+          )}
+
+          <div className="flex flex-col gap-5 border-t border-[#ece6dc] pt-5">
+            <div className="flex flex-col gap-1">
+              <h4 className="text-sm font-bold text-[#26221e]">
+                本人確認書類
+              </h4>
+              <p className="text-xs text-[#726b5e] leading-relaxed">
+                古物営業法に基づき、ご本人様の顔写真と身分証明書の写真をご提出いただきます（コースにかかわらず必須です）。
+              </p>
+            </div>
+            <Field
+              label="ご本人様の顔写真"
+              required
+              hint="本人確認のため、正面を向いたご自身の写真をアップロードしてください。"
+            >
+              <input
+                type="file"
+                name="selfie_photo"
+                accept="image/jpeg,image/png"
+                required
+                onChange={(e) => handleSingleFileChange(e, setSelfiePhoto)}
+                className={inputCls}
+              />
+            </Field>
+            {selfiePhoto && (
+              <p className="text-xs text-[#5c554d] -mt-3">
+                {selfiePhoto.name}（{(selfiePhoto.size / 1024 / 1024).toFixed(1)}MB）
+              </p>
+            )}
+            <Field
+              label="身分証明書の写真（厚みがわかる角度で撮影）"
+              required
+              hint="運転免許証・健康保険証・マイナンバーカードなどを、真上からではなく少し斜めにして、カードの厚み（角の部分）が写るように撮影してください。平面的なコピーと区別するための撮影方法です。"
+            >
+              <input
+                type="file"
+                name="id_document_photo"
+                accept="image/jpeg,image/png"
+                required
+                onChange={(e) => handleSingleFileChange(e, setIdPhoto)}
+                className={inputCls}
+              />
+            </Field>
+            {idPhoto && (
+              <p className="text-xs text-[#5c554d] -mt-3">
+                {idPhoto.name}（{(idPhoto.size / 1024 / 1024).toFixed(1)}MB）
+              </p>
+            )}
+          </div>
 
           {course === "provisional" && (
             <>
               <Field
                 label="買取商品の内容"
                 required
-                hint="レーベル名・タイトルなど、わかる範囲でご記入ください。"
+                hint="レーベル名・タイトルなど、わかる範囲でご記入ください。タイトルより、レーベル名・品番の方が査定がスムーズです。"
               >
                 <textarea
                   name="product_details"
                   rows={4}
                   required
+                  placeholder="例: エスワン 3本、デマンド 5本、品番不明1本 など（レーベル名+本数、わかれば品番もご記入ください）"
                   className={inputCls}
                 />
               </Field>
@@ -356,7 +480,24 @@ export default function ApplicationForm() {
             <SummaryRow label="お名前" value={summary.name} />
             <SummaryRow label="メールアドレス" value={summary.email} />
             <SummaryRow label="電話番号" value={summary.phone} />
-            <SummaryRow label="買取希望商品の本数" value={summary.quantity} />
+            {course === "provisional" ? (
+              <>
+                <SummaryRow label="DVD本数" value={summary.dvd_count} />
+                <SummaryRow label="ブルーレイ本数" value={summary.bd_count} />
+                <SummaryRow label="コミック冊数" value={summary.comic_count} />
+                <SummaryRow label="その他（点数）" value={summary.other_count} />
+              </>
+            ) : (
+              <SummaryRow label="買取希望商品の本数" value={summary.quantity} />
+            )}
+            <SummaryRow
+              label="ご本人様の顔写真"
+              value={selfiePhoto ? selfiePhoto.name : ""}
+            />
+            <SummaryRow
+              label="身分証明書の写真"
+              value={idPhoto ? idPhoto.name : ""}
+            />
             {course === "provisional" && (
               <>
                 <SummaryRow

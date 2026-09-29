@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#f7f3ee"/>
+  <g transform="translate(-18 -18)">
+  <g stroke="#26221e" stroke-width="24" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="88" y="120" width="296" height="280" rx="32" fill="#fffdf9"/>
+    <path d="M88 200 V152 a32 32 0 0 1 32 -32 H352 a32 32 0 0 1 32 32 V200 Z" fill="#b3242b"/>
+    <line x1="158" y1="88" x2="158" y2="148"/>
+    <line x1="314" y1="88" x2="314" y2="148"/>
+  </g>
+  <g fill="#e8a97a">
+    <rect x="128" y="236" width="44" height="36" rx="9"/>
+    <rect x="196" y="236" width="44" height="36" rx="9"/>
+    <rect x="264" y="236" width="44" height="36" rx="9"/>
+    <rect x="128" y="300" width="44" height="36" rx="9"/>
+    <rect x="196" y="300" width="44" height="36" rx="9" fill="#b3242b"/>
+  </g>
+  <circle cx="384" cy="384" r="76" fill="#b3242b" stroke="#26221e" stroke-width="24"/>
+  <path d="M384 338 L395.8 367.8 L427.7 369.8 L403.1 390.2 L411.0 421.2 L384 404 L357.0 421.2 L364.9 390.2 L340.3 369.8 L372.2 367.8 Z" fill="#e8a97a" stroke="#e8a97a" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+</svg>
