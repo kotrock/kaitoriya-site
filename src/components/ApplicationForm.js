@@ -308,7 +308,7 @@ export default function ApplicationForm() {
               <input
                 type="number"
                 name="quantity"
-                min={1}
+                min={5}
                 required
                 className={inputCls}
               />
@@ -417,7 +417,7 @@ export default function ApplicationForm() {
               発送用の段ボール
             </h3>
             <p className="text-xs text-[#726b5e] leading-relaxed">
-              高買屋では5箱まで無料で発送用の段ボールをお送りいたします。ご自身でご用意いただくと査定額に＋300円上乗せいたします（買取対象商品が10点以上の場合）。
+              高買屋では5箱まで無料で発送用の段ボールをお送りいたします。ご自身でご用意いただくと査定額に＋300円上乗せいたします（ディスクのみ・レンタル品等を除く10点以上の場合。セット商品は点数に関わらず1点としてカウントします）。
             </p>
             <select name="box_option" className={inputCls} defaultValue="">
               <option value="" disabled>
@@ -426,8 +426,8 @@ export default function ApplicationForm() {
               <option value="段ボールが必要（無料）">
                 段ボールが必要（無料）
               </option>
-              <option value="自分で用意する（+300円・買取対象商品10点以上の場合）">
-                自分で用意する（+300円・買取対象商品10点以上の場合）
+              <option value="自分で用意する（+300円・ディスクのみ・レンタル品等を除く10点以上の場合）">
+                自分で用意する（+300円・ディスクのみ・レンタル品等を除く10点以上の場合）
               </option>
             </select>
           </div>

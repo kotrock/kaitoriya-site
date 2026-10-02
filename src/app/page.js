@@ -289,6 +289,9 @@ export default function Home() {
             </p>
           </div>
           <BonusTiers aRank={bonusTiers.aRank} bRank={bonusTiers.bRank} />
+          <p className="text-xs text-[#726b5e] text-center">
+            ※2枚組・3枚組などのセット商品は、点数に関わらず1点としてカウントします。
+          </p>
         </div>
       </section>
 
