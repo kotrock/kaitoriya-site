@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Zen_Kaku_Gothic_New } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import AgeGate from "@/components/AgeGate";
 import Header from "@/components/Header";
@@ -41,6 +42,8 @@ export const metadata = {
   },
 };
 
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="ja" className={`h-full antialiased ${zenKakuGothicNew.variable}`}>
@@ -50,6 +53,22 @@ export default function RootLayout({ children }) {
         <main className="flex-1">{children}</main>
         <Footer />
         <Analytics />
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
