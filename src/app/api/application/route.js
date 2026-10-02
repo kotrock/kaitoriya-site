@@ -12,12 +12,6 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 const TO_EMAIL = "pbkaitori@gmail.com";
 
-// TODO: Resendの送信ドメイン認証が完了したら、この一時上書きを削除して
-// 申込者本人のメールアドレス（email）宛に自動返信を送信するように戻してください。
-// 現在はResendの未検証ドメイン（onboarding@resend.dev）が登録済みアドレスにしか
-// 送信できないため、動作確認用にktvotarou@gmail.comへ固定しています。
-const APPLICANT_EMAIL_TEST_OVERRIDE = "ktvotarou@gmail.com";
-
 function courseLabel(course) {
   return course === "provisional"
     ? "仮査定申請（仮査定あり）"
@@ -60,7 +54,8 @@ export async function POST(request) {
 
   const selfieFile = formData.get("selfie_photo");
   const idFile = formData.get("id_document_photo");
-  const identityFiles = [selfieFile, idFile].filter(
+  const paypayQrFile = formData.get("paypay_qr_photo");
+  const identityFiles = [selfieFile, idFile, paypayQrFile].filter(
     (entry) => entry instanceof File && entry.size > 0
   );
 
@@ -127,50 +122,105 @@ export async function POST(request) {
   }
 
   if (boxOption) lines.push(`発送用の段ボール：${boxOption}`);
-  if (paymentMethod) lines.push(`お支払い方法：${paymentMethod}`);
-  lines.push(
-    `本人確認書類：顔写真「${selfieFile?.name || "未添付"}」／身分証明書「${idFile?.name || "未添付"}」`
-  );
+  if (course === "speed") {
+    if (paymentMethod) lines.push(`お支払い方法：${paymentMethod}`);
+    lines.push(
+      `本人確認書類：顔写真「${selfieFile?.name || "未添付"}」／身分証明書「${idFile?.name || "未添付"}」`
+    );
+    if (paypayQrFile instanceof File && paypayQrFile.size > 0) {
+      lines.push(`PayPay受け取り用QRコード：「${paypayQrFile.name}」`);
+    }
+  }
   if (productImages.length > 0) {
     lines.push(
       `添付画像：${productImages.length}枚（${productImages.map((f) => f.name).join("、")}）`
     );
   }
 
+  // 店舗宛メールにのみ追記する合計点数・数量ボーナス早見表。
+  // 申込みフォームでは本数がカテゴリ別（DVD/ブルーレイ/コミック等）にしか分からず、
+  // A/Bどちらのボーナスランクが適用されるかは現物確認後でないと判定できないため、
+  // 査定担当者が加算を忘れないよう、合計点数と早見表を店舗宛メールにのみ表示する。
+  const totalQuantity =
+    course === "provisional"
+      ? (Number(dvdCount) || 0) +
+        (Number(bdCount) || 0) +
+        (Number(comicCount) || 0) +
+        (Number(otherCount) || 0)
+      : Number(quantity) || 0;
+
+  const storeOnlyNotes = [
+    `合計点数（申告ベース）：${totalQuantity}点`,
+    "",
+    "【数量ボーナス早見（該当する場合、査定時に加算）】",
+    "Aランク（発売2週間以内・保証価格 / 発売1ヶ月以内・完品が対象）",
+    "　10本以上 +1,500円 / 30本以上 +3,000円 / 50本以上 +6,000円 / 100本以上 個別見積り",
+    "Bランク（発売1年以上・完品 / ディスクのみ・状態不良が対象）",
+    "　30本以上 +300円 / 50本以上 +800円 / 100本以上 +2,000円",
+    "※実際の適用ランクは現物確認後の区分により判定してください。",
+  ];
+
   const contactLine = `${company.phone}（受付 ${company.phoneHours}）`;
+  const courseNameForBody = course === "provisional" ? "仮査定" : "スピード査定";
   const applicantSubject =
     course === "provisional"
       ? "【高買屋】仮査定のお申し込みを受け付けました"
-      : "【高買屋】お申し込みを受け付けました";
-  const applicantNextSteps =
+      : "【高買屋】スピード査定のお申し込みを受け付けました";
+
+  // 無料段ボールをご自身で用意いただいた場合の+300円ボーナスは、
+  // 既存の box_option（ApplicationForm.js）・FAQと同じ内容で案内する。
+  const boxBonusCallout = [
+    "-------------------------------------------",
+    "段ボールをご自身でご用意いただくと、査定額に+300円プラス！",
+    "-------------------------------------------",
+  ].join("\n");
+
+  const applicantFlow =
     course === "provisional"
       ? [
-          "・店舗にてお送りいただいた内容を確認し、1〜2営業日を目安に仮査定結果をご連絡いたします。",
-          "・仮査定額にご納得いただけない場合は、発送前であればキャンセルも可能です。",
-          "・内容にご納得いただけましたら、発送用の段ボールをお送りしますので商品をご準備ください。",
+          "1. 担当者が内容を確認し、仮査定額をメールにてご案内いたします",
+          "2. 仮査定額にご納得いただけましたら、ご案内するページ（発送確定フォーム）より本人確認書類・お振込み先情報をご提出の上、商品をご発送ください（この時点でご成約となります）",
+          "3. 商品到着後、現物を確認の上、正式な査定額を確定いたします",
+          "4. 正式査定額をご案内し、ご同意いただけましたらお振込みいたします",
         ]
       : [
-          "・ご指定の内容で発送用の段ボールをお送りいたします（ご自身でご用意いただく場合は不要です）。",
-          "・商品が店舗に到着次第すぐに査定を行い、査定額に関わらずそのままお振込みいたします。",
-          "・スピード買取（仮査定なし）は査定額に関わらずキャンセルができませんので、あらかじめご了承ください。",
+          "1. 商品を梱包の上、着払いにてご発送ください",
+          "　梱包方法は自由です（段ボール・袋など、お好きな方法で構いません）。",
+          "　無料の段ボールをご希望の方にはお送りいたします。",
+          "",
+          boxBonusCallout,
+          "",
+          "2. 商品到着後、現物を確認の上、査定額を確定いたします",
+          "3. 査定額確定後、指定の口座へお振込みいたします",
+          "4. お振込み完了後、査定内訳などの詳細をメールにてご連絡いたします",
         ];
+
+  const applicantCancelPolicy =
+    course === "provisional"
+      ? "仮査定額のご案内後、発送前であればいつでもキャンセル可能です（キャンセル料等は一切かかりません）。また、発送後の現物確認で正式査定額が仮査定額と大きく異なる場合はご返送も可能ですが、その際の返送料はお客様のご負担となります。本人確認書類等は、発送を決めていただいた段階で初めてご提出いただく形のため、仮査定のみをご希望の場合に個人情報をご提出いただく必要はございません。"
+      : "スピード査定は、商品を発送いただいた時点でご成約となります。発送前であればキャンセル可能ですが、発送後のキャンセルはお受けできません。査定額は当社の買取基準に基づき確定させていただきますので、あらかじめご了承ください。";
+
   const applicantText = [
     `${name} 様`,
     "",
-    `この度は高買屋へお申し込みいただき、誠にありがとうございます。`,
-    `以下の内容で「${courseLabel(course)}」のお申し込みを受け付けました。`,
+    `この度は「${courseNameForBody}」にお申し込みいただき、誠にありがとうございます。`,
+    "以下の内容でお申し込みを承りました。",
     "",
+    "【お申し込み内容】",
     "――――――――――――――――",
     ...lines,
     "――――――――――――――――",
     "",
-    "【今後の流れ】",
-    ...applicantNextSteps,
+    "■ 今後の流れ",
+    ...applicantFlow,
     "",
-    "ご不明な点がございましたら、お電話にてお気軽にお問い合わせください。",
+    "■ キャンセルについて",
+    applicantCancelPolicy,
+    "",
+    "ご不明点がございましたら、お気軽にお問い合わせください。",
     contactLine,
     "",
-    "高買屋",
+    `高買屋（${company.legalName}）`,
   ].join("\n");
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -188,7 +238,7 @@ export async function POST(request) {
   }
 
   const fromAddress =
-    process.env.RESEND_FROM_EMAIL || "高買屋 査定フォーム <onboarding@resend.dev>";
+    process.env.RESEND_FROM_EMAIL || "高買屋 査定フォーム <noreply@mail.pb-kaitori.com>";
 
   // 店舗宛メール（画像添付あり）。こちらの送信成功を申し込み受付の成否とする。
   try {
@@ -206,7 +256,7 @@ export async function POST(request) {
           course === "provisional"
             ? "【高買屋】仮査定申請がありました"
             : "【高買屋】スピード買取のお申し込みがありました",
-        text: lines.join("\n"),
+        text: [...lines, "", ...storeOnlyNotes].join("\n"),
         attachments: attachments.length > 0 ? attachments : undefined,
       }),
     });
@@ -230,27 +280,29 @@ export async function POST(request) {
   // 申込者宛の自動返信メール（画像添付なし）。
   // 店舗宛メールが送れていれば申し込み自体は成立しているため、
   // こちらが失敗してもリクエスト全体は失敗させず、ログのみ残す。
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: fromAddress,
-        to: [APPLICANT_EMAIL_TEST_OVERRIDE],
-        subject: applicantSubject,
-        text: applicantText,
-      }),
-    });
+  if (email) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromAddress,
+          to: [email],
+          subject: applicantSubject,
+          text: applicantText,
+        }),
+      });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Resend送信エラー（申込者宛自動返信）:", res.status, errText);
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Resend送信エラー（申込者宛自動返信）:", res.status, errText);
+      }
+    } catch (err) {
+      console.error("申込者宛自動返信メールの送信中にエラーが発生しました:", err);
     }
-  } catch (err) {
-    console.error("申込者宛自動返信メールの送信中にエラーが発生しました:", err);
   }
 
   // attachments / files はここでスコープを抜けて破棄される（ディスクには一度も書き出していない）。

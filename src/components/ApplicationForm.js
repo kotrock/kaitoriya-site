@@ -29,10 +29,11 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 
 export default function ApplicationForm() {
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
-  const [paymentMethod, setPaymentMethod] = useState("bank");
+  const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
   const [images, setImages] = useState([]);
   const [selfiePhoto, setSelfiePhoto] = useState(null);
   const [idPhoto, setIdPhoto] = useState(null);
+  const [paypayQrPhoto, setPaypayQrPhoto] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorMessage, setErrorMessage] = useState("");
   const [step, setStep] = useState(0);
@@ -95,6 +96,7 @@ export default function ApplicationForm() {
       delete entries.images;
       delete entries.selfie_photo;
       delete entries.id_document_photo;
+      delete entries.paypay_qr_photo;
       setSummary(entries);
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -291,54 +293,56 @@ export default function ApplicationForm() {
             </Field>
           )}
 
-          <div className="flex flex-col gap-5 border-t border-[#ece6dc] pt-5">
-            <div className="flex flex-col gap-1">
-              <h4 className="text-sm font-bold text-[#26221e]">
-                本人確認書類
-              </h4>
-              <p className="text-xs text-[#726b5e] leading-relaxed">
-                古物営業法に基づき、ご本人様の顔写真と身分証明書の写真をご提出いただきます（コースにかかわらず必須です）。
-              </p>
+          {course === "speed" && (
+            <div className="flex flex-col gap-5 border-t border-[#ece6dc] pt-5">
+              <div className="flex flex-col gap-1">
+                <h4 className="text-sm font-bold text-[#26221e]">
+                  本人確認書類
+                </h4>
+                <p className="text-xs text-[#726b5e] leading-relaxed">
+                  古物営業法に基づき、ご本人様の顔写真と身分証明書の写真をご提出いただきます（必須）。
+                </p>
+              </div>
+              <Field
+                label="ご本人様の顔写真"
+                required
+                hint="本人確認のため、正面を向いたご自身の写真をアップロードしてください。"
+              >
+                <input
+                  type="file"
+                  name="selfie_photo"
+                  accept="image/jpeg,image/png"
+                  required
+                  onChange={(e) => handleSingleFileChange(e, setSelfiePhoto)}
+                  className={inputCls}
+                />
+              </Field>
+              {selfiePhoto && (
+                <p className="text-xs text-[#5c554d] -mt-3">
+                  {selfiePhoto.name}（{(selfiePhoto.size / 1024 / 1024).toFixed(1)}MB）
+                </p>
+              )}
+              <Field
+                label="身分証明書の写真（厚みがわかる角度で撮影）"
+                required
+                hint="運転免許証・健康保険証・マイナンバーカードなどを、真上からではなく少し斜めにして、カードの厚み（角の部分）が写るように撮影してください。平面的なコピーと区別するための撮影方法です。"
+              >
+                <input
+                  type="file"
+                  name="id_document_photo"
+                  accept="image/jpeg,image/png"
+                  required
+                  onChange={(e) => handleSingleFileChange(e, setIdPhoto)}
+                  className={inputCls}
+                />
+              </Field>
+              {idPhoto && (
+                <p className="text-xs text-[#5c554d] -mt-3">
+                  {idPhoto.name}（{(idPhoto.size / 1024 / 1024).toFixed(1)}MB）
+                </p>
+              )}
             </div>
-            <Field
-              label="ご本人様の顔写真"
-              required
-              hint="本人確認のため、正面を向いたご自身の写真をアップロードしてください。"
-            >
-              <input
-                type="file"
-                name="selfie_photo"
-                accept="image/jpeg,image/png"
-                required
-                onChange={(e) => handleSingleFileChange(e, setSelfiePhoto)}
-                className={inputCls}
-              />
-            </Field>
-            {selfiePhoto && (
-              <p className="text-xs text-[#5c554d] -mt-3">
-                {selfiePhoto.name}（{(selfiePhoto.size / 1024 / 1024).toFixed(1)}MB）
-              </p>
-            )}
-            <Field
-              label="身分証明書の写真（厚みがわかる角度で撮影）"
-              required
-              hint="運転免許証・健康保険証・マイナンバーカードなどを、真上からではなく少し斜めにして、カードの厚み（角の部分）が写るように撮影してください。平面的なコピーと区別するための撮影方法です。"
-            >
-              <input
-                type="file"
-                name="id_document_photo"
-                accept="image/jpeg,image/png"
-                required
-                onChange={(e) => handleSingleFileChange(e, setIdPhoto)}
-                className={inputCls}
-              />
-            </Field>
-            {idPhoto && (
-              <p className="text-xs text-[#5c554d] -mt-3">
-                {idPhoto.name}（{(idPhoto.size / 1024 / 1024).toFixed(1)}MB）
-              </p>
-            )}
-          </div>
+          )}
 
           {course === "provisional" && (
             <>
@@ -356,16 +360,14 @@ export default function ApplicationForm() {
                 />
               </Field>
               <Field
-                label="商品の画像"
-                required
-                hint="jpg/png形式、1枚あたり10MBまで。複数枚選択できます。"
+                label="商品の画像（任意）"
+                hint="jpg/png形式、1枚あたり10MBまで。複数枚選択できます。商品の画像があると、より正確な仮査定額をご案内できます。"
               >
                 <input
                   type="file"
                   name="images"
                   accept="image/jpeg,image/png"
                   multiple
-                  required
                   onChange={handleImagesChange}
                   className={inputCls}
                 />
@@ -402,71 +404,99 @@ export default function ApplicationForm() {
               <option value="段ボールが必要（無料）">
                 段ボールが必要（無料）
               </option>
-              <option value="自分で用意する（+300円）">
-                自分で用意する（+300円）
+              <option value="自分で用意する（+300円・買取対象商品10点以上の場合）">
+                自分で用意する（+300円・買取対象商品10点以上の場合）
               </option>
             </select>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h3 className="text-base font-bold text-[#26221e]">
-              お支払い方法
-            </h3>
-            <div className="flex flex-col gap-3 text-sm text-[#26221e]">
-              <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
-                <Image
-                  src="/payment-bank.png"
-                  alt=""
-                  width={96}
-                  height={96}
-                  className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
-                />
-                <span className="flex items-start gap-2 flex-1">
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    value={paymentLabels.bank}
-                    className="mt-1"
-                    checked={paymentMethod === "bank"}
-                    onChange={() => setPaymentMethod("bank")}
+          {course === "speed" && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base font-bold text-[#26221e]">
+                お支払い方法
+                <span className="text-[#b3242b]"> （必須）</span>
+              </h3>
+              <div className="flex flex-col gap-3 text-sm text-[#26221e]">
+                <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
+                  <Image
+                    src="/payment-bank.png"
+                    alt=""
+                    width={96}
+                    height={96}
+                    className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
                   />
-                  <span>
-                    <span className="font-semibold">{paymentLabels.bank}</span>
-                    <br />
-                    <span className="text-xs text-[#726b5e]">
-                      指定の口座へお振込みいたします。
+                  <span className="flex items-start gap-2 flex-1">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value={paymentLabels.bank}
+                      required
+                      className="mt-1"
+                      checked={paymentMethod === "bank"}
+                      onChange={() => setPaymentMethod("bank")}
+                    />
+                    <span>
+                      <span className="font-semibold">{paymentLabels.bank}</span>
+                      <br />
+                      <span className="text-xs text-[#726b5e]">
+                        指定の口座へお振込みいたします。
+                      </span>
                     </span>
                   </span>
-                </span>
-              </label>
-              <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
-                <Image
-                  src="/payment-paypay.png"
-                  alt=""
-                  width={96}
-                  height={96}
-                  className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
-                />
-                <span className="flex items-start gap-2 flex-1">
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    value={paymentLabels.paypay}
-                    className="mt-1"
-                    checked={paymentMethod === "paypay"}
-                    onChange={() => setPaymentMethod("paypay")}
+                </label>
+                <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
+                  <Image
+                    src="/payment-paypay.png"
+                    alt=""
+                    width={96}
+                    height={96}
+                    className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
                   />
-                  <span>
-                    <span className="font-semibold">{paymentLabels.paypay}</span>
-                    <br />
-                    <span className="text-xs text-[#726b5e]">
-                      振込手数料がかからず、逆にボーナスを上乗せしてお支払いします。
+                  <span className="flex items-start gap-2 flex-1">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value={paymentLabels.paypay}
+                      required
+                      className="mt-1"
+                      checked={paymentMethod === "paypay"}
+                      onChange={() => setPaymentMethod("paypay")}
+                    />
+                    <span>
+                      <span className="font-semibold">{paymentLabels.paypay}</span>
+                      <br />
+                      <span className="text-xs text-[#726b5e]">
+                        振込手数料がかからず、逆にボーナスを上乗せしてお支払いします。
+                      </span>
                     </span>
                   </span>
-                </span>
-              </label>
+                </label>
+              </div>
+              {paymentMethod === "paypay" && (
+                <>
+                  <Field
+                    label="PayPay受け取り用QRコード画像"
+                    required
+                    hint="PayPayアプリの「受け取る」画面に表示されるQRコードのスクリーンショットまたは写真をアップロードしてください。"
+                  >
+                    <input
+                      type="file"
+                      name="paypay_qr_photo"
+                      accept="image/jpeg,image/png"
+                      required
+                      onChange={(e) => handleSingleFileChange(e, setPaypayQrPhoto)}
+                      className={inputCls}
+                    />
+                  </Field>
+                  {paypayQrPhoto && (
+                    <p className="text-xs text-[#5c554d] -mt-3">
+                      {paypayQrPhoto.name}（{(paypayQrPhoto.size / 1024 / 1024).toFixed(1)}MB）
+                    </p>
+                  )}
+                </>
+              )}
             </div>
-          </div>
+          )}
         </div>
 
         {/* STEP 3: 確認 */}
@@ -490,14 +520,18 @@ export default function ApplicationForm() {
             ) : (
               <SummaryRow label="買取希望商品の本数" value={summary.quantity} />
             )}
-            <SummaryRow
-              label="ご本人様の顔写真"
-              value={selfiePhoto ? selfiePhoto.name : ""}
-            />
-            <SummaryRow
-              label="身分証明書の写真"
-              value={idPhoto ? idPhoto.name : ""}
-            />
+            {course === "speed" && (
+              <>
+                <SummaryRow
+                  label="ご本人様の顔写真"
+                  value={selfiePhoto ? selfiePhoto.name : ""}
+                />
+                <SummaryRow
+                  label="身分証明書の写真"
+                  value={idPhoto ? idPhoto.name : ""}
+                />
+              </>
+            )}
             {course === "provisional" && (
               <>
                 <SummaryRow
@@ -515,13 +549,21 @@ export default function ApplicationForm() {
               </>
             )}
             <SummaryRow label="発送用の段ボール" value={summary.box_option} />
-            <SummaryRow label="お支払い方法" value={summary.payment_method} />
+            {course === "speed" && (
+              <>
+                <SummaryRow label="お支払い方法" value={summary.payment_method} />
+                <SummaryRow
+                  label="PayPay受け取り用QRコード"
+                  value={paypayQrPhoto ? paypayQrPhoto.name : ""}
+                />
+              </>
+            )}
           </div>
 
           {course === "speed" && (
             <label className="flex items-start gap-2 text-xs text-[#5c554d]">
               <input type="checkbox" required className="mt-0.5" />
-              査定額に関わらずキャンセルはできないことに同意します。
+              発送前であればキャンセル可能ですが、商品発送後はキャンセルできないことに同意します。
             </label>
           )}
           <label className="flex items-start gap-2 text-xs text-[#5c554d]">
