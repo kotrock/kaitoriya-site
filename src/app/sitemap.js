@@ -3,6 +3,7 @@ import { siteUrl, columns } from "@/data/site";
 const routes = [
   { path: "", changeFrequency: "weekly", priority: 1 },
   { path: "/application", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/campaign", changeFrequency: "monthly", priority: 0.7 },
   { path: "/recycle", changeFrequency: "monthly", priority: 0.8 },
   { path: "/faq", changeFrequency: "monthly", priority: 0.6 },
   { path: "/user-voice", changeFrequency: "monthly", priority: 0.6 },

@@ -6,6 +6,9 @@ export const metadata = {
   title: "個人情報不要！アダルトDVD無料回収します! | アダルトDVD高価買取の高買屋",
   description:
     "お部屋をすっきり！いらないアダルトDVDを段ボールに入れて手軽に処分。何点でも送料無料、個人情報不要、段ボール無料提供。",
+  alternates: {
+    canonical: "/recycle",
+  },
 };
 
 export default function RecyclePage() {

@@ -7,6 +7,9 @@ import { results, resultsSummary } from "@/data/site";
 export const metadata = {
   title: "買取実績 | アダルトDVD高価買取の高買屋",
   description: "高買屋の買取実績をご紹介します。カテゴリ・点数・買取金額の目安をご確認いただけます。",
+  alternates: {
+    canonical: "/results",
+  },
 };
 
 export default function ResultsPage() {

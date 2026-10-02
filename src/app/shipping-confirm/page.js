@@ -5,6 +5,13 @@ export const metadata = {
   title: "発送確定フォーム | アダルトDVD高価買取の高買屋",
   description:
     "仮査定額にご納得いただいた方向けの発送確定フォームです。本人確認書類とお振込み先情報をご提出の上、商品をご発送ください。",
+  alternates: {
+    canonical: "/shipping-confirm",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function ShippingConfirmPage() {

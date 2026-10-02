@@ -4,6 +4,9 @@ import ApplicationForm from "@/components/ApplicationForm";
 export const metadata = {
   title: "買取お申込みフォーム | アダルトDVD高価買取の高買屋",
   description: "アダルトDVD・ブルーレイの無料査定はこちらからお申し込みください。",
+  alternates: {
+    canonical: "/application",
+  },
 };
 
 export default function ApplicationPage() {

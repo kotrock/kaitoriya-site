@@ -1,10 +1,25 @@
 import PageHero from "@/components/PageHero";
-import { company, payoutOptions } from "@/data/site";
+import { company, payoutOptions, ogImage } from "@/data/site";
+
+const title = "特定商取引法 | アダルトDVD高価買取の高買屋";
+const description =
+  "高買屋の特定商取引法に基づく表記です。社名・所在地・連絡先・送料・お支払い方法・キャンセルについてご案内します。";
 
 export const metadata = {
-  title: "特定商取引法 | アダルトDVD高価買取の高買屋",
-  description:
-    "高買屋の特定商取引法に基づく表記です。社名・所在地・連絡先・送料・お支払い方法・キャンセルについてご案内します。",
+  title,
+  description,
+  alternates: {
+    canonical: "/tokuhou",
+  },
+  openGraph: {
+    title,
+    description,
+    url: "/tokuhou",
+    siteName: "高買屋",
+    locale: "ja_JP",
+    type: "website",
+    images: [{ ...ogImage, alt: title }],
+  },
 };
 
 const rows = [

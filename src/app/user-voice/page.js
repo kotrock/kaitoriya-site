@@ -6,6 +6,9 @@ import { voices } from "@/data/site";
 export const metadata = {
   title: "利用者の声 | アダルトDVD高価買取の高買屋",
   description: "ご利用者の声。迷っている暇なし！まずは簡単お申込み。",
+  alternates: {
+    canonical: "/user-voice",
+  },
 };
 
 export default function UserVoicePage() {

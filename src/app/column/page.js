@@ -5,6 +5,9 @@ import { columns } from "@/data/site";
 export const metadata = {
   title: "買取コラム | アダルトDVD高価買取の高買屋",
   description: "アダルトDVD・ブルーレイの買取査定に役立つコラムをお届けします。",
+  alternates: {
+    canonical: "/column",
+  },
 };
 
 export default function ColumnPage() {

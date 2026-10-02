@@ -5,6 +5,9 @@ export const metadata = {
   title: "プライバシーポリシー | アダルトDVD高価買取の高買屋",
   description:
     "高買屋における個人情報の取扱いについてのご案内です。お申し込みフォームでお預かりする情報の利用目的や、外部サービスの利用についてご確認いただけます。",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
 };
 
 const sections = [

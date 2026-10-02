@@ -1,11 +1,26 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-import { faqs } from "@/data/site";
+import { faqs, ogImage } from "@/data/site";
+
+const title = "よくある質問 | アダルトDVD高価買取の高買屋";
+const description =
+  "お客様からよせられる、よくあるご質問をまとめました。お問い合わせの前に、こちらをご確認ください。";
 
 export const metadata = {
-  title: "よくある質問 | アダルトDVD高価買取の高買屋",
-  description:
-    "お客様からよせられる、よくあるご質問をまとめました。お問い合わせの前に、こちらをご確認ください。",
+  title,
+  description,
+  alternates: {
+    canonical: "/faq",
+  },
+  openGraph: {
+    title,
+    description,
+    url: "/faq",
+    siteName: "高買屋",
+    locale: "ja_JP",
+    type: "website",
+    images: [{ ...ogImage, alt: title }],
+  },
 };
 
 export default function FaqPage() {

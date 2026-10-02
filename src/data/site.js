@@ -3,6 +3,14 @@
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://kaitoriya-site.vercel.app";
 
+// OGP/Twitterカード用の既定画像。src/app/opengraph-image.js で動的生成される
+// 1200x630のブランド画像（ロゴ・サイト名・タグライン入り）を参照する。
+export const ogImage = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+};
+
 export const company = {
   name: "高買屋",
   legalName: "有限会社 萬屋カンパニー",

@@ -3,7 +3,7 @@ import { Zen_Kaku_Gothic_New } from "next/font/google";
 import AgeGate from "@/components/AgeGate";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { siteUrl } from "@/data/site";
+import { siteUrl, ogImage } from "@/data/site";
 
 const zenKakuGothicNew = Zen_Kaku_Gothic_New({
   weight: ["700", "900"],
@@ -20,6 +20,9 @@ export const metadata = {
   metadataBase: new URL(siteUrl),
   title,
   description,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title,
     description,
@@ -27,11 +30,13 @@ export const metadata = {
     siteName: "高買屋",
     locale: "ja_JP",
     type: "website",
+    images: [{ ...ogImage, alt: title }],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
+    images: [ogImage.url],
   },
 };
 

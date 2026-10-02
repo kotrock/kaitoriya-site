@@ -1,11 +1,26 @@
 import PageHero from "@/components/PageHero";
 import Link from "next/link";
-import { firstTimeBonus } from "@/data/site";
+import { firstTimeBonus, ogImage } from "@/data/site";
+
+const title = `初めてのご利用で査定額+${firstTimeBonus}キャンペーン | アダルトDVD高価買取の高買屋`;
+const description =
+  "初めてご利用の方限定で査定額に1,000円を上乗せするキャンペーンのご案内です。対象条件・注意事項をご確認ください。";
 
 export const metadata = {
-  title: `初めてのご利用で査定額+${firstTimeBonus}キャンペーン | アダルトDVD高価買取の高買屋`,
-  description:
-    "初めてご利用の方限定で査定額に1,000円を上乗せするキャンペーンのご案内です。対象条件・注意事項をご確認ください。",
+  title,
+  description,
+  alternates: {
+    canonical: "/campaign",
+  },
+  openGraph: {
+    title,
+    description,
+    url: "/campaign",
+    siteName: "高買屋",
+    locale: "ja_JP",
+    type: "website",
+    images: [{ ...ogImage, alt: title }],
+  },
 };
 
 const conditions = [

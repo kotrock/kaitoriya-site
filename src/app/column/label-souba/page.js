@@ -7,6 +7,9 @@ const column = columns.find((c) => c.slug === "label-souba");
 export const metadata = {
   title: `${column.title} | 買取コラム | アダルトDVD高価買取の高買屋`,
   description: column.excerpt,
+  alternates: {
+    canonical: "/column/label-souba",
+  },
 };
 
 const labelNotes = [

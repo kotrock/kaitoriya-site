@@ -140,7 +140,7 @@ export default function ShippingConfirmForm() {
             <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
               <Image
                 src="/payment-bank.png"
-                alt=""
+                alt="銀行振込"
                 width={96}
                 height={96}
                 className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"
@@ -161,7 +161,7 @@ export default function ShippingConfirmForm() {
             <label className="flex items-start gap-3 border border-[#ece6dc] rounded-xl p-3">
               <Image
                 src="/payment-paypay.png"
-                alt=""
+                alt="PayPay"
                 width={96}
                 height={96}
                 className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-lg"

@@ -6,6 +6,9 @@ export const metadata = {
   title: "会社概要 | アダルトDVD高価買取の高買屋",
   description:
     "アダルトDVD高価買取の高買屋の会社概要です。社名・所在地・代表者・古物商許可番号などの企業情報をご案内します。",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 const rows = [
