@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+// スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
+// 短すぎる場合はbotによる自動送信とみなす。必須の身分証明書アップロードを
+// 伴うフォームを人間が3秒未満で完了することは現実的にないための閾値。
+const MIN_ELAPSED_MS = 3000;
 
 export default function ShippingConfirmForm() {
   const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
@@ -13,6 +18,12 @@ export default function ShippingConfirmForm() {
   const [paypayQrPhoto, setPaypayQrPhoto] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorMessage, setErrorMessage] = useState("");
+  const [formLoadedAt, setFormLoadedAt] = useState(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormLoadedAt(Date.now());
+  }, []);
 
   function handleSingleFileChange(e, setPhoto) {
     const input = e.target;
@@ -29,6 +40,15 @@ export default function ShippingConfirmForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
+    const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
+    if (elapsed < MIN_ELAPSED_MS) {
+      setStatus("error");
+      setErrorMessage("");
+      return;
+    }
+
     setStatus("sending");
     setErrorMessage("");
 
@@ -77,6 +97,8 @@ export default function ShippingConfirmForm() {
           tabIndex={-1}
           autoComplete="off"
         />
+        {/* スパム対策用の時間トラップ。フォーム表示時刻をサーバー側でも検証する */}
+        <input type="hidden" name="form_loaded_at" value={formLoadedAt ?? ""} />
 
         <Field label="お名前" required>
           <input type="text" name="name" required className={inputCls} />

@@ -11,6 +11,10 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 const TO_EMAIL = "pbkaitori@gmail.com";
 
+// スパム対策の「時間トラップ」。フロントエンドの判定だけに頼らず、
+// サーバー側でもフォーム表示時刻からの経過時間を検証する。
+const MIN_ELAPSED_MS = 3000;
+
 export async function POST(request) {
   let formData;
   try {
@@ -26,6 +30,16 @@ export async function POST(request) {
   // 成功したふりをして黙って処理を打ち切る（bot に判定材料を与えない）。
   if (formData.get("botcheck")) {
     return Response.json({ success: true });
+  }
+
+  // スパム対策の時間トラップ。フォームが表示されてからの経過時間が
+  // 短すぎる場合はbotによる自動送信とみなしてブロックする。
+  const formLoadedAt = Number(formData.get("form_loaded_at"));
+  if (!formLoadedAt || Date.now() - formLoadedAt < MIN_ELAPSED_MS) {
+    return Response.json(
+      { success: false, error: "送信に失敗しました。もう一度お試しください。" },
+      { status: 400 }
+    );
   }
 
   const name = String(formData.get("name") || "");

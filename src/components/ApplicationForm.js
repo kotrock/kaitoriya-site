@@ -1,10 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions } from "@/data/site";
+
+// スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
+// 短すぎる場合はbotによる自動送信とみなす。4ステップの入力・ファイル選択を
+// 人間が3秒未満で完了することは現実的にないための閾値。
+const MIN_ELAPSED_MS = 3000;
 
 const STEPS = ["コース選択", "お客様情報", "詳細", "確認"];
 
@@ -38,6 +43,7 @@ export default function ApplicationForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
+  const [formLoadedAt, setFormLoadedAt] = useState(null);
   const cardRef = useRef(null);
   const formRef = useRef(null);
   const step0Ref = useRef(null);
@@ -45,6 +51,11 @@ export default function ApplicationForm() {
   const step2Ref = useRef(null);
 
   const stepRefs = [step0Ref, step1Ref, step2Ref];
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormLoadedAt(Date.now());
+  }, []);
 
   function validateStep(el) {
     if (!el) return true;
@@ -110,6 +121,15 @@ export default function ApplicationForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
+    const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
+    if (elapsed < MIN_ELAPSED_MS) {
+      setStatus("error");
+      setErrorMessage("");
+      return;
+    }
+
     setStatus("sending");
     setErrorMessage("");
 
@@ -165,6 +185,8 @@ export default function ApplicationForm() {
           tabIndex={-1}
           autoComplete="off"
         />
+        {/* スパム対策用の時間トラップ。フォーム表示時刻をサーバー側でも検証する */}
+        <input type="hidden" name="form_loaded_at" value={formLoadedAt ?? ""} />
 
         {/* STEP 0: コース選択 */}
         <div
