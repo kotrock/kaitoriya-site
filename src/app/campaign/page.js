@@ -1,10 +1,15 @@
 import PageHero from "@/components/PageHero";
 import Link from "next/link";
-import { firstTimeBonus, ogImage } from "@/data/site";
+import { firstTimeBonus, campaign, ogImage } from "@/data/site";
+import { isCampaignActive } from "@/lib/campaign";
 
 const title = `初めてのご利用で査定額+${firstTimeBonus}キャンペーン | アダルトDVD高価買取の高買屋`;
 const description =
   "初めてご利用の方限定で査定額に1,000円を上乗せするキャンペーンのご案内です。対象条件・注意事項をご確認ください。";
+
+// キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
+// 静的生成のまま固定化せず、短い間隔でISR再生成する。
+export const revalidate = 60;
 
 export const metadata = {
   title,
@@ -33,12 +38,34 @@ const conditions = [
 ];
 
 export default function CampaignPage() {
+  const campaignActive = isCampaignActive();
+
   return (
     <>
       <PageHero
         eyebrow="CAMPAIGN"
-        title={`「初めてのご利用で査定額+${firstTimeBonus}」キャンペーン`}
-        lead={`対象条件を満たす方は、査定額に${firstTimeBonus}をプラスしてお振込みいたします。`}
+        title={
+          campaignActive ? (
+            <>
+              「初めてのご利用で査定額
+              <del className="text-white/55 decoration-2 ml-1">
+                +{campaign.normalBonus}
+              </del>
+              {" → "}
+              <span className="text-[#ffe08a]">
+                期間限定+{campaign.campaignBonus}
+              </span>
+              」キャンペーン
+            </>
+          ) : (
+            `「初めてのご利用で査定額+${campaign.normalBonus}」キャンペーン`
+          )
+        }
+        lead={
+          campaignActive
+            ? `対象条件を満たす方は、査定額に期間限定で${campaign.campaignBonus}をプラスしてお振込みいたします（通常${campaign.normalBonus}）。`
+            : `対象条件を満たす方は、査定額に${campaign.normalBonus}をプラスしてお振込みいたします。`
+        }
       />
       <section className="w-full px-6 md:px-8 py-14">
         <div className="max-w-[700px] mx-auto flex flex-col gap-6">
@@ -59,8 +86,9 @@ export default function CampaignPage() {
 
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#726b5e] leading-relaxed">
-              ※{firstTimeBonus}
+              ※{campaignActive ? campaign.campaignBonus : campaign.normalBonus}
               は査定額に上乗せしてご案内いたします。仮査定の時点で加算後の金額を明記いたしますので、あわせてご確認ください。
+              {campaignActive && `（通常${campaign.normalBonus}・期間限定キャンペーン適用中）`}
             </p>
             <p className="text-xs text-[#726b5e] leading-relaxed">
               ※本キャンペーンは予告なく内容を変更・終了する場合がございます。

@@ -11,7 +11,7 @@ import {
   resultsSummary,
   faqs,
   company,
-  firstTimeBonus,
+  campaign,
   storeVisit,
 } from "@/data/site";
 import {
@@ -23,8 +23,14 @@ import ResultsSummary from "@/components/ResultsSummary";
 import ResultsTable from "@/components/ResultsTable";
 import BonusTiers from "@/components/BonusTiers";
 import { siteUrl } from "@/data/site";
+import { isCampaignActive } from "@/lib/campaign";
+
+// キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
+// 静的生成のまま固定化せず、短い間隔でISR再生成する。
+export const revalidate = 60;
 
 export default function Home() {
+  const campaignActive = isCampaignActive();
   const [, addressRegion, addressLocality] =
     company.address.match(/^(.{2,3}[都道府県])(.+)$/) || [];
 
@@ -79,7 +85,7 @@ export default function Home() {
             href="/campaign"
             className="text-xs text-white/70 underline hover:text-white"
           >
-            ※初回1,000円プラスの詳細はこちら
+            ※初回{campaignActive ? campaign.campaignBonus : campaign.normalBonus}プラスの詳細はこちら
           </Link>
           <h1 className="font-heading text-2xl sm:text-3xl md:text-[40px] leading-snug font-extrabold break-keep text-white">
             アダルトDVD・ブルーレイの
@@ -164,7 +170,23 @@ export default function Home() {
               初めてのご利用で
             </span>
             <span className="block text-2xl sm:text-3xl md:text-4xl mt-1">
-              査定額+{firstTimeBonus}
+              {campaignActive ? (
+                <>
+                  査定額
+                  <del className="text-white/55 decoration-2 ml-1">
+                    +{campaign.normalBonus}
+                  </del>
+                  {" → "}
+                  <span className="text-[#ffe08a]">
+                    期間限定+{campaign.campaignBonus}
+                  </span>
+                </>
+              ) : (
+                <>査定額+{campaign.normalBonus}</>
+              )}
+            </span>
+            <span className="block text-xs sm:text-sm font-semibold mt-1 text-white/80">
+              （10点以上）
             </span>
             <Link
               href="/campaign"

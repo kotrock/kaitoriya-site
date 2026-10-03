@@ -41,8 +41,19 @@ export const payoutOptions = {
   paypayBonus: "300円",
 };
 
-// 初回利用キャンペーンのボーナス額。
+// 初回利用キャンペーンのボーナス額（通常時）。
 export const firstTimeBonus = "1,000円";
+
+// 期間限定キャンペーン設定。activeがtrueの間、startDate〜endDate（日本時間、
+// 各日の0:00〜23:59:59）の期間内だけ、通常のfirstTimeBonusの代わりにcampaignBonusを
+// 表示する。期間判定はsrc/lib/campaign.jsのisCampaignActive()で行う。
+export const campaign = {
+  active: true,
+  normalBonus: "1,000円",
+  campaignBonus: "1,500円",
+  startDate: "2026-10-08",
+  endDate: "2026-10-21",
+};
 
 export const nav = [
   { href: "/#price", label: "買取価格表" },
