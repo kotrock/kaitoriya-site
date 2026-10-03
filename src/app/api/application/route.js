@@ -65,6 +65,14 @@ export async function POST(request) {
     .getAll("images")
     .filter((entry) => entry instanceof File && entry.size > 0);
 
+  // 仮査定申請は商品画像が必須。クライアント側のrequired属性をすり抜けた場合の保険。
+  if (course === "provisional" && productImages.length === 0) {
+    return Response.json(
+      { success: false, error: "商品の画像を1枚以上アップロードしてください。" },
+      { status: 400 }
+    );
+  }
+
   const selfieFile = formData.get("selfie_photo");
   const idFile = formData.get("id_document_photo");
   const paypayQrFile = formData.get("paypay_qr_photo");

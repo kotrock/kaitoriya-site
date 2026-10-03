@@ -382,14 +382,16 @@ export default function ApplicationForm() {
                 />
               </Field>
               <Field
-                label="商品の画像（任意）"
-                hint="jpg/png形式、1枚あたり10MBまで。複数枚選択できます。商品の画像があると、より正確な仮査定額をご案内できます。"
+                label="商品の画像"
+                required
+                hint="査定希望商品はすべて、背表紙が見える写真をアップロードしてください（品番確認のため）。画像がない商品は最低価格での査定となります。（jpg/png形式、1枚あたり10MBまで。複数枚選択できます。）"
               >
                 <input
                   type="file"
                   name="images"
                   accept="image/jpeg,image/png"
                   multiple
+                  required
                   onChange={handleImagesChange}
                   className={inputCls}
                 />
