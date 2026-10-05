@@ -51,8 +51,8 @@ export const campaign = {
   active: true,
   normalBonus: "1,000円",
   campaignBonus: "1,500円",
-  startDate: "2026-10-08",
-  endDate: "2026-10-21",
+  startDate: "2026-10-05",
+  endDate: "2026-10-19",
 };
 
 export const nav = [
