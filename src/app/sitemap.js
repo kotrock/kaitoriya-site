@@ -21,11 +21,15 @@ export default function sitemap() {
     path: `/column/${c.slug}`,
     changeFrequency: "monthly",
     priority: 0.5,
+    // 記事ごとに固定の更新日を指定したい場合はcolumnsのlastModifiedを使う。
+    lastModified: c.lastModified ? new Date(c.lastModified) : undefined,
   }));
-  return [...routes, ...columnRoutes].map(({ path, changeFrequency, priority }) => ({
-    url: `${siteUrl}${path}`,
-    lastModified,
-    changeFrequency,
-    priority,
-  }));
+  return [...routes, ...columnRoutes].map(
+    ({ path, changeFrequency, priority, lastModified: itemLastModified }) => ({
+      url: `${siteUrl}${path}`,
+      lastModified: itemLastModified || lastModified,
+      changeFrequency,
+      priority,
+    })
+  );
 }

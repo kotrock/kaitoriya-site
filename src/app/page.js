@@ -587,6 +587,12 @@ export default function Home() {
             >
               買取コラムを見る →
             </Link>
+            <Link
+              href="/column/adult-dvd-kaitori-takaku-uru"
+              className="text-sm font-bold text-[#5c554d] hover:text-[#b3242b] hover:underline"
+            >
+              アダルトDVDを高く売る7つのコツ →
+            </Link>
           </div>
         </div>
       </section>

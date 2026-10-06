@@ -202,6 +202,15 @@ export const columns = [
       "エスワン・ムーディーズ・マドンナ・FALENOなど人気レーベルの買取相場の傾向と、高く売れやすい条件を解説します。",
     date: "2026-09-21",
   },
+  {
+    slug: "adult-dvd-kaitori-takaku-uru",
+    title: "アダルトDVDを高く売る7つのコツ",
+    excerpt:
+      "アダルトDVD・Blu-rayを少しでも高く売るコツを、買取専門店が解説。品番の確認、セット商品の数え方、まとめ売りのコツ、査定・送料・振込手数料無料で売る方法まで。",
+    date: "2026-10-06",
+    // sitemap.js 用の固定更新日。未指定の場合はリクエスト時点の日付が使われる。
+    lastModified: "2026-10-06",
+  },
 ];
 
 export const faqs = [
