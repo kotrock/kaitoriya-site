@@ -8,11 +8,10 @@ const PAGE_PATH = "/column/adult-dvd-kaitori-takaku-uru";
 const PAGE_URL = `${siteUrl}${PAGE_PATH}`;
 const PUBLISHED_DATE = "2026-10-06";
 
-const title =
-  "アダルトDVDを高く売る7つのコツ｜宅配買取の流れと注意点【2026年版】";
+const title = "アダルトDVDはどこで売るのが正解？買取方法4つを比較【2026年版】";
 const description =
-  "アダルトDVD・Blu-rayを少しでも高く売るコツを、買取専門店が解説。品番の確認、セット商品の数え方、まとめ売りのコツ、査定・送料・振込手数料無料で売る方法まで。";
-const h1Title = "アダルトDVDを高く売る7つのコツ｜宅配買取の流れと注意点";
+  "アダルトDVD・Blu-rayはどこで売るのが良いか迷っている方へ。フリマ・オークション・リサイクル店・宅配買取専門店の違いを比較し、手数料無料で売れる方法まで買取専門店が解説します。";
+const h1Title = "アダルトDVDはどこで売るのが正解？買取方法4つを比較";
 
 // キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
 // 静的生成のまま固定化せず、短い間隔でISR再生成する。
@@ -37,64 +36,76 @@ export const metadata = {
 
 const comparisonRows = [
   {
-    item: "状態",
-    good: "傷が少ない、ケース・帯あり",
-    bad: "大きな傷、割れ、カビ",
+    place: "フリマアプリ（メルカリ等）",
+    effort: "出品・梱包・やり取りが必要",
+    suited: "手間をかけても1本ずつ売りたい人",
+    caution:
+      "アダルトDVD・BDの出品を規約で禁止しているサービスがある（メルカリは禁止とされています）。最新規約を確認",
   },
   {
-    item: "付属品",
-    good: "特典・ブックレットあり",
-    bad: "欠品多数",
+    place: "ネットオークション（ヤフオク等）",
+    effort: "出品・梱包・やり取りが必要",
+    suited: "相場を見ながら自分で売りたい人",
+    caution:
+      "倫理団体の認証マークがないアダルト映像商品は出品禁止、パッケージ表裏の画像掲載が必須などのルールがある（2020年前後のルール改定）。最新ルールを確認",
   },
   {
-    item: "種類",
-    good: "市販品の正規ディスク",
-    bad: "レンタル落ち品、ディスクのみ（条件による）",
+    place: "総合リサイクル店（店頭・宅配）",
+    effort: "店頭へ持ち込み",
+    suited: "少量をすぐ現金化したい人",
+    caution:
+      "アダルトDVDの取扱いは店舗により異なる。品番まで見られず、価格が一律になることがある",
   },
   {
-    item: "数え方",
-    good: "ー",
-    bad: "セット商品（2枚組・3枚組など）は枚数に関わらず1点",
+    place: "アダルト専門の宅配買取",
+    effort: "申込み・梱包のみ",
+    suited: "まとめて、手間なく売りたい人",
+    caution:
+      "手数料（送料・振込手数料・査定料）が有料の店もあるので比較が必要",
   },
 ];
 
 const checklist = [
   "古物商許可番号が明記されている",
   "運営会社と所在地が分かる",
-  "査定・送料・振込手数料が無料",
+  "査定・送料・振込手数料が無料か",
+  "買取対象とキャンペーンの条件が分かりやすい",
   "相談できる窓口がある",
   "品番ごとの査定に対応している",
-  "キャンペーンの条件が分かりやすい",
 ];
 
 const articleFaqs = [
   {
-    q: "アダルトDVDは売れますか？",
-    a: "はい、正規の市販品なら売れます。品番が分かり、状態が良いほど高くなります。",
+    q: "アダルトDVDはどこで売るのが一番高いですか？",
+    a: "金額は商品の人気・品番・状態によって変わり、一概には言えません。市販の正規ディスクをまとめて売る場合は、品番で査定する専門の買取店が向いています。",
+  },
+  {
+    q: "メルカリでアダルトDVDは売れますか？",
+    a: "メルカリは規約でアダルトDVD・BDの出品を禁止しているとされています。最新の規約はメルカリの公式ヘルプでご確認ください。",
+  },
+  {
+    q: "ヤフオクで売るときの注意点は？",
+    a: "倫理団体の認証マークがないアダルト映像商品は出品できないなど、独自のルールがあります。最新ルールはヤフオクの公式ヘルプでご確認ください。",
+  },
+  {
+    q: "店頭買取と宅配買取はどちらがいいですか？",
+    a: "すぐ現金化したい少量なら店頭、人に会わずにまとめて売りたいなら宅配が向いています。なお、店頭でアダルトDVDを扱っているかは店舗により異なります。",
   },
   {
     q: "1枚だけでも買い取ってもらえますか？",
-    a: "いいえ、原則として一度のお申し込みでアダルトDVD・ブルーレイは5本以上、アダルトコミックのみの場合は10冊以上からの買取となります（仮査定コースも同様です）。なお、初回利用キャンペーンの対象は10点以上、スピードコースのご依頼条件は5点以上です。",
+    a: "原則5本以上（コミックのみ10冊以上）からの買取です。",
   },
   {
-    q: "写真は必ず必要ですか？",
-    a: "仮査定コースでは必須です。背表紙が見える写真を全商品分お願いします。写真がない商品は最低価格での査定になります。",
+    q: "レンタル落ちは売れますか？",
+    a: "買取自体は対象です。ただしキャンペーンの対象外です。",
   },
   {
     q: "セット商品は何点になりますか？",
     a: "枚数にかかわらず1点です。",
   },
   {
-    q: "レンタル落ちは売れますか？",
-    a: "買取自体は対象です。ただし、ケースなし・レンタル落ち品は個別査定（定額）となり、初回利用キャンペーンなどの対象には含まれません。詳しくはFAQをご確認ください。",
-  },
-  {
     q: "手数料はかかりますか？",
     a: `査定・送料・振込手数料のすべて${payoutOptions.bankFee}です。`,
-  },
-  {
-    q: "個人情報は大丈夫ですか？",
-    a: "古物営業法に基づく本人確認を行い、取り扱いには注意しています。プライバシーポリシーをご確認ください。",
   },
 ];
 
@@ -153,6 +164,7 @@ export default function AdultDvdKaitoriTakakuUruPage() {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: h1Title,
+    description,
     datePublished: PUBLISHED_DATE,
     dateModified: PUBLISHED_DATE,
     author: {
@@ -200,7 +212,7 @@ export default function AdultDvdKaitoriTakakuUruPage() {
       {
         "@type": "ListItem",
         position: 3,
-        name: "アダルトDVDを高く売る7つのコツ",
+        name: "アダルトDVDはどこで売るのが正解？",
         item: PAGE_URL,
       },
     ],
@@ -244,19 +256,19 @@ export default function AdultDvdKaitoriTakakuUruPage() {
               コラム
             </Link>
             <span>›</span>
-            <span>アダルトDVDを高く売る7つのコツ</span>
+            <span>アダルトDVDはどこで売るのが正解？</span>
           </nav>
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-loose text-[#5c554d]">
               <strong className="text-[#26221e]">
-                結論から言うと、高く売るポイントは「品番が分かる状態で」「まとめて」「専門店に」出すことです。
+                結論から言うと、まとめて売るなら「アダルト専門の宅配買取」がおすすめです。
               </strong>
-              この3つを押さえるだけで、同じ商品でも査定額が変わります。
+              フリマやオークションは手間や出品ルールのハードルがあり、リサイクル店は店舗ごとに取扱いが違うためです。
             </p>
             <p className="text-sm leading-loose text-[#5c554d]">
               この記事では、パラダイスBOX公式の買取サービス「{company.name}
-              」が、実際の査定で見ているポイントをもとに解説します。
+              」が、売る場所4つの違いと、失敗しない選び方を解説します。
             </p>
           </div>
 
@@ -271,8 +283,11 @@ export default function AdultDvdKaitoriTakakuUruPage() {
             <h2 className="text-sm font-bold text-[#26221e]">目次</h2>
             <ol className="list-decimal list-inside text-sm text-[#5c554d] flex flex-col gap-1.5">
               <li>
-                <a href="#tips" className="hover:text-[#b3242b] hover:underline">
-                  高く売る7つのコツ
+                <a
+                  href="#conclusion"
+                  className="hover:text-[#b3242b] hover:underline"
+                >
+                  結論：迷ったら宅配買取専門店
                 </a>
               </li>
               <li>
@@ -280,12 +295,15 @@ export default function AdultDvdKaitoriTakakuUruPage() {
                   href="#comparison"
                   className="hover:text-[#b3242b] hover:underline"
                 >
-                  売れる・売れにくいものの違い
+                  売る場所4つを比較
                 </a>
               </li>
               <li>
-                <a href="#flow" className="hover:text-[#b3242b] hover:underline">
-                  宅配買取の流れ
+                <a
+                  href="#details"
+                  className="hover:text-[#b3242b] hover:underline"
+                >
+                  場所ごとのメリット・注意点
                 </a>
               </li>
               <li>
@@ -293,7 +311,25 @@ export default function AdultDvdKaitoriTakakuUruPage() {
                   href="#checklist"
                   className="hover:text-[#b3242b] hover:underline"
                 >
-                  買取店の選び方チェックリスト
+                  宅配買取専門店の選び方
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#kaitoriya"
+                  className="hover:text-[#b3242b] hover:underline"
+                >
+                  高買屋でできること
+                </a>
+              </li>
+              <li>
+                <a href="#tips" className="hover:text-[#b3242b] hover:underline">
+                  高く売る3つのコツ
+                </a>
+              </li>
+              <li>
+                <a href="#flow" className="hover:text-[#b3242b] hover:underline">
+                  宅配買取の流れ
                 </a>
               </li>
               <li>
@@ -304,130 +340,224 @@ export default function AdultDvdKaitoriTakakuUruPage() {
             </ol>
           </nav>
 
-          <section id="tips" className="flex flex-col gap-7">
+          <section id="conclusion" className="flex flex-col gap-3">
             <h2 className="text-lg font-bold text-[#26221e]">
-              1. 高く売る7つのコツ
+              1. 結論：迷ったら宅配買取専門店
             </h2>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ① 売る前に「品番」を確認する
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                査定は品番（型番）で行います。背表紙やパッケージにある品番が読める状態にしておくと、査定が速く、間違いも起きません。同じタイトルでも版違いや再販で価格が異なるため、品番は一番大切な情報です。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ② まとめて1回で送る
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                1点ずつ送るより、まとめて送るほうが有利になる仕組みの店が多くあります。{company.name}
-                でも、10点以上で「初めての方は買取額アップ」の対象になり、点数に応じた数量ボーナスもあります。売るか迷っているものも、この機会にまとめて整理するのがおすすめです。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ③ 付属品・状態をそろえる
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                ケース、帯、特典、ブックレットがそろっているほど評価されます。ディスクの汚れは柔らかい布で軽く拭き、ケースの汚れも落としておきましょう。ただし、強くこすって傷をつけないよう注意してください。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ④ 「仮査定」で売る前に金額を知る
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                いきなり送るのが不安なら、事前に概算を知れる仮査定が便利です。{company.name}
-                では、全商品の背表紙が見える写真をアップロードしてもらいます。品番を確認して正確に見積もるためで、写真がない商品は最低価格での査定になります。逆に言うと、写真さえしっかり撮れば、金額のブレが小さくなります。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ⑤ 手数料の「見えないコスト」を比較する
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                買取額が高くても、送料、振込手数料、査定手数料で手取りが減ることがあります。{company.name}
-                は査定無料・送料無料・振込手数料{payoutOptions.bankFee}
-                なので、表示された金額がそのまま手取りの基準になります。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ⑥ 段ボールは自分で用意すると得になることがある
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                梱包用の段ボールを自分で用意すると特典がつく場合があります（条件はディスクのみ・レンタル品等を除く10点以上）。手元にある箱を使えば、その分お得です。
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <h3 className="text-base font-bold text-[#26221e]">
-                コツ⑦ 価値が分かる専門店に出す
-              </h3>
-              <p className="text-sm leading-loose text-[#5c554d]">
-                総合リサイクル店では、品番まで見られず一律に低めの価格になることがあります。専門知識のある店は、相場に合わせた価格をつけられます。
-              </p>
-            </div>
+            <p className="text-sm leading-loose text-[#5c554d]">
+              こんな方は宅配買取専門店が向いています。
+            </p>
+            <ul className="list-disc list-inside text-sm leading-loose text-[#5c554d] flex flex-col gap-1">
+              <li>5本以上まとめて処分したい</li>
+              <li>自宅から出ずに、人に会わず売りたい</li>
+              <li>出品や発送のやり取りをしたくない</li>
+              <li>品番ごとにきちんと査定してほしい</li>
+            </ul>
+            <p className="text-sm leading-loose text-[#5c554d]">
+              逆に、1〜2本だけで手間をかけてもよい方は、フリマ・オークションも選択肢です（ただし後述のルールに注意）。
+            </p>
           </section>
-
-          <ApplyCta />
 
           <section id="comparison" className="flex flex-col gap-4">
             <h2 className="text-lg font-bold text-[#26221e]">
-              2. 売れる・売れにくいものの違い
+              2. 売る場所4つを比較
             </h2>
             <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
-              <table className="min-w-[560px] w-full text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-[#ece6dc]">
+              <table className="min-w-[760px] w-full text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-[#ece6dc]">
                 <caption className="sr-only">
-                  売れやすい商品・売れにくい商品の比較
+                  アダルトDVDを売る場所4つの比較
                 </caption>
                 <thead>
                   <tr className="bg-[#26221e] text-white text-[13px]">
                     <th scope="col" className="py-3 px-5 text-left font-bold">
-                      項目
+                      売る場所
                     </th>
                     <th scope="col" className="py-3 px-5 text-left font-bold">
-                      売れやすい
+                      手間
                     </th>
                     <th scope="col" className="py-3 px-5 text-left font-bold">
-                      売れにくい／対象外になりやすい
+                      向いている人
+                    </th>
+                    <th scope="col" className="py-3 px-5 text-left font-bold">
+                      注意点
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonRows.map((row) => (
                     <tr
-                      key={row.item}
+                      key={row.place}
                       className="border-t border-[#ece6dc] even:bg-[#f7f3ee]"
                     >
                       <th
                         scope="row"
-                        className="py-3.5 px-5 text-left font-bold text-[#26221e] whitespace-nowrap"
+                        className="py-3.5 px-5 text-left font-bold text-[#26221e]"
                       >
-                        {row.item}
+                        {row.place}
                       </th>
-                      <td className="py-3.5 px-5 text-[#5c554d]">{row.good}</td>
-                      <td className="py-3.5 px-5 text-[#5c554d]">{row.bad}</td>
+                      <td className="py-3.5 px-5 text-[#5c554d]">
+                        {row.effort}
+                      </td>
+                      <td className="py-3.5 px-5 text-[#5c554d]">
+                        {row.suited}
+                      </td>
+                      <td className="py-3.5 px-5 text-[#5c554d]">
+                        {row.caution}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="text-xs text-[#726b5e] leading-relaxed">
-              セット商品は、実際の枚数にかかわらず1点として数えます。キャンペーンや数量ボーナスの点数にも同じルールを使います。
+              各サービスの規約・取扱いは変更されることがあります。最新の内容は各公式ページでご確認ください。
             </p>
+          </section>
+
+          <section id="details" className="flex flex-col gap-7">
+            <h2 className="text-lg font-bold text-[#26221e]">
+              3. 場所ごとのメリット・注意点
+            </h2>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-bold text-[#26221e]">
+                フリマアプリ（メルカリ等）
+              </h3>
+              <p className="text-sm leading-loose text-[#5c554d]">
+                個人間の取引で、自分で値段を決められるのが魅力です。ただし、アダルトDVD・BDの出品を規約で禁止しているサービスがあります（メルカリは18歳未満も利用できるため禁止とされています）。出品して削除されたり、アカウント停止になったりする場合があるため、事前に最新の規約を確認してください。
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-bold text-[#26221e]">
+                ネットオークション（ヤフオク等）
+              </h3>
+              <p className="text-sm leading-loose text-[#5c554d]">
+                入札で価格が上がる可能性があります。一方で、アダルト映像商品には出品ルールがあります。日本の倫理団体の認証マークがない商品は出品できない、パッケージの表裏の鮮明な画像が必要、といった条件です。そのうえで、出品・梱包・発送・購入者対応を自分で行う必要があります。
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-bold text-[#26221e]">
+                総合リサイクル店
+              </h3>
+              <p className="text-sm leading-loose text-[#5c554d]">
+                持ち込めば現金化が早いのが利点です。ただし、アダルトDVDを扱っているかどうかは店舗により異なります。対面で出すことに抵抗がある方も多く、品番まで細かく見てもらえず、価格が一律になることもあります。事前に電話などで取扱いを確認すると安心です。
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-bold text-[#26221e]">
+                アダルト専門の宅配買取
+              </h3>
+              <p className="text-sm leading-loose text-[#5c554d]">
+                自宅から申し込み、箱に詰めて送るだけです。専門店は品番で査定するため、市販の正規ディスクがまとまっている場合に適しています。人に会わずに済み、発送もまとめて1回で済みます。
+              </p>
+            </div>
+          </section>
+
+          <section id="checklist" className="flex flex-col gap-4">
+            <h2 className="text-lg font-bold text-[#26221e]">
+              4. 宅配買取専門店の選び方
+            </h2>
+            <ul className="flex flex-col gap-2.5">
+              {checklist.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2.5 text-sm text-[#5c554d]"
+                >
+                  <CheckCircleIcon className="w-4.5 h-4.5 text-[#2f9e5c] shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-[#726b5e] leading-relaxed">
+              ※手数料は、買取額から引かれると手取りが減ります。比較するときは必ず「手取り額」で見てください。
+            </p>
+          </section>
+
+          <section id="kaitoriya" className="flex flex-col gap-4">
+            <h2 className="text-lg font-bold text-[#26221e]">
+              5. 高買屋でできること
+            </h2>
+            <p className="text-sm leading-loose text-[#5c554d]">
+              {company.name}
+              は、仙台でTENGA
+              SHOPなどを運営するパラダイスBOXの公式サービスです。
+            </p>
+            <ul className="list-disc list-inside text-sm leading-loose text-[#5c554d] flex flex-col gap-1.5">
+              <li>
+                査定無料・送料無料・振込手数料{payoutOptions.bankFee}
+              </li>
+              <li>
+                初めての方は買取額アップ（10点以上、キャンペーン期間中は期間限定の増額）。ディスクのみ・レンタル品等を除く。セット商品は1点として数える
+              </li>
+              <li>
+                事前に金額が分かる「仮査定」（全商品の背表紙が見える写真が必要。写真がない商品は最低価格での査定）
+              </li>
+              <li>急ぎの方向けの「スピードコース」（5点以上）</li>
+              <li>
+                段ボールを自分で用意すると特典（ディスクのみ・レンタル品等を除く10点以上）
+              </li>
+              <li>
+                運営会社と古物商許可番号は
+                <Link
+                  href="/tokuhou"
+                  className="text-[#b3242b] hover:underline"
+                >
+                  特定商取引法に基づく表記
+                </Link>
+                ページで確認できる（{company.legalName}・
+                {company.antiqueLicense}）
+              </li>
+            </ul>
+            <ApplyCta />
+          </section>
+
+          <section id="tips" className="flex flex-col gap-5">
+            <h2 className="text-lg font-bold text-[#26221e]">
+              6. 高く売る3つのコツ
+            </h2>
+            <ol className="flex flex-col gap-3">
+              <li className="flex gap-3 text-sm leading-loose text-[#5c554d]">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-[#b3242b] text-white text-xs font-bold flex items-center justify-center">
+                  1
+                </span>
+                <span>
+                  <strong className="text-[#26221e]">
+                    品番が読める状態で出す：
+                  </strong>
+                  背表紙やパッケージの品番が分かると、査定が速く正確になります。
+                </span>
+              </li>
+              <li className="flex gap-3 text-sm leading-loose text-[#5c554d]">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-[#b3242b] text-white text-xs font-bold flex items-center justify-center">
+                  2
+                </span>
+                <span>
+                  <strong className="text-[#26221e]">
+                    まとめて1回で送る：
+                  </strong>
+                  点数が増えるほど有利になる仕組み（初回キャンペーン、数量ボーナス）があります。
+                </span>
+              </li>
+              <li className="flex gap-3 text-sm leading-loose text-[#5c554d]">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-[#b3242b] text-white text-xs font-bold flex items-center justify-center">
+                  3
+                </span>
+                <span>
+                  <strong className="text-[#26221e]">
+                    付属品・状態をそろえる：
+                  </strong>
+                  ケース・帯・特典があると評価されます。汚れは柔らかい布で軽く拭いてください（強くこすって傷をつけないように）。
+                </span>
+              </li>
+            </ol>
           </section>
 
           <section id="flow" className="flex flex-col gap-4">
             <h2 className="text-lg font-bold text-[#26221e]">
-              3. 宅配買取の流れ（3ステップ）
+              7. 宅配買取の流れ（3ステップ）
             </h2>
             <ol className="flex flex-col gap-3">
               <li className="flex gap-3 text-sm leading-loose text-[#5c554d]">
@@ -471,35 +601,11 @@ export default function AdultDvdKaitoriTakakuUruPage() {
             </p>
           </section>
 
-          <section id="checklist" className="flex flex-col gap-4">
-            <h2 className="text-lg font-bold text-[#26221e]">
-              4. 買取店の選び方チェックリスト
-            </h2>
-            <ul className="flex flex-col gap-2.5">
-              {checklist.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2.5 text-sm text-[#5c554d]"
-                >
-                  <CheckCircleIcon className="w-4.5 h-4.5 text-[#2f9e5c] shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-[#726b5e] leading-relaxed">
-              補足：{company.name}
-              は、仙台でTENGA
-              SHOPなどを運営するパラダイスBOXの公式サービスです。実店舗での販売経験が、相場判断に活きています。
-            </p>
-          </section>
-
           <CampaignNotice active={campaignActive} />
-
-          <ApplyCta />
 
           <section id="faq" className="flex flex-col gap-3.5">
             <h2 className="text-lg font-bold text-[#26221e]">
-              5. よくある質問
+              8. よくある質問
             </h2>
             {articleFaqs.map((faq) => (
               <div
@@ -517,6 +623,8 @@ export default function AdultDvdKaitoriTakakuUruPage() {
               </div>
             ))}
           </section>
+
+          <ApplyCta />
 
           <div className="bg-white border border-[#ece6dc] rounded-2xl p-6 flex flex-col gap-3">
             <h2 className="text-base font-bold text-[#26221e]">関連ページ</h2>

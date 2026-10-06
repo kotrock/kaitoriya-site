@@ -591,7 +591,7 @@ export default function Home() {
               href="/column/adult-dvd-kaitori-takaku-uru"
               className="text-sm font-bold text-[#5c554d] hover:text-[#b3242b] hover:underline"
             >
-              アダルトDVDを高く売る7つのコツ →
+              アダルトDVDはどこで売る？買取方法を比較 →
             </Link>
           </div>
         </div>
