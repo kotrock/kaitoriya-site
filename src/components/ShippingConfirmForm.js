@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
+import { trackEvent } from "@/lib/analytics";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
@@ -62,6 +63,7 @@ export default function ShippingConfirmForm() {
       const data = await res.json();
       if (data.success) {
         setStatus("sent");
+        trackEvent("shipping_confirm_submit", { form_name: "shipping_confirm" });
       } else {
         setStatus("error");
         setErrorMessage(data.error || "");

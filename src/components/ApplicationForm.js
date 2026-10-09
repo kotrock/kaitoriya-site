@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions } from "@/data/site";
+import { trackEvent } from "@/lib/analytics";
 
 // スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
 // 短すぎる場合はbotによる自動送信とみなす。4ステップの入力・ファイル選択を
@@ -31,6 +32,19 @@ const paymentLabels = {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+// GA4計測用の申込み点数。スピード買取はquantity、仮査定は内訳の合計（route.jsの
+// totalQuantity計算と同じロジック）。個人情報は含めない。
+function computeItemCount(formData, course) {
+  if (course === "provisional") {
+    const dvd = Number(formData.get("dvd_count")) || 0;
+    const bd = Number(formData.get("bd_count")) || 0;
+    const comic = Number(formData.get("comic_count")) || 0;
+    const other = Number(formData.get("other_count")) || 0;
+    return dvd + bd + comic + other;
+  }
+  return Number(formData.get("quantity")) || 0;
+}
 
 export default function ApplicationForm() {
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
@@ -143,6 +157,11 @@ export default function ApplicationForm() {
       const data = await res.json();
       if (data.success) {
         setStatus("sent");
+        trackEvent("generate_lead", {
+          form_name: "application",
+          course,
+          item_count: computeItemCount(formData, course),
+        });
       } else {
         setStatus("error");
         setErrorMessage(data.error || "");
