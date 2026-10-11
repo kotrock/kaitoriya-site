@@ -182,7 +182,6 @@ export async function POST(request) {
     "※セット商品（2枚組・3枚組等）は点数に関わらず1点としてカウントしてください（上記の合計点数は申告ベースのため、現物確認時に要再集計）。",
   ];
 
-  const contactLine = `${company.phone}（受付 ${company.phoneHours}）`;
   const courseNameForBody = course === "provisional" ? "仮査定" : "スピード査定";
   const applicantSubject =
     course === "provisional"
@@ -240,7 +239,8 @@ export async function POST(request) {
     applicantCancelPolicy,
     "",
     "ご不明点がございましたら、お気軽にお問い合わせください。",
-    contactLine,
+    `電話：${company.phone}`,
+    `電話受付時間：${company.phoneHours}`,
     "",
     `高買屋（${company.legalName}）`,
   ].join("\n");
