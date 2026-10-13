@@ -23,7 +23,7 @@ import ResultsSummary from "@/components/ResultsSummary";
 import ResultsTable from "@/components/ResultsTable";
 import BonusTiers from "@/components/BonusTiers";
 import { siteUrl } from "@/data/site";
-import { isCampaignActive } from "@/lib/campaign";
+import { isCampaignActive, getCampaignEndDateShort } from "@/lib/campaign";
 
 // キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
 // 静的生成のまま固定化せず、短い間隔でISR再生成する。
@@ -109,6 +109,12 @@ export default function Home() {
               無料回収について
             </Link>
           </div>
+          <a
+            href="#price"
+            className="text-xs text-white/70 hover:text-white underline"
+          >
+            買取価格の目安を見る ↓
+          </a>
 
           <div className="w-full max-w-[880px] bg-white rounded-2xl p-8 md:p-10 mt-6 flex items-center gap-8 text-[#26221e] flex-wrap justify-center shadow-[0_16px_40px_rgba(179,36,43,0.15)] border-2 border-[#b3242b]/20">
             <div className="text-left shrink-0">
@@ -187,6 +193,7 @@ export default function Home() {
             </span>
             <span className="block text-xs sm:text-sm font-semibold mt-1 text-white/80">
               （10点以上）
+              {campaignActive && `　〜${getCampaignEndDateShort()}まで`}
             </span>
             <Link
               href="/campaign"

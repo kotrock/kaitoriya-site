@@ -15,3 +15,10 @@ export function isCampaignActive(now = new Date()) {
 export function getCurrentBonus(now = new Date()) {
   return isCampaignActive(now) ? campaign.campaignBonus : campaign.normalBonus;
 }
+
+// 終了日を「11/2」のような短い月/日形式で返す。日本時間の日付表記として扱うため、
+// Dateのタイムゾーン変換は使わずcampaign.endDate（YYYY-MM-DD）の文字列を直接分解する。
+export function getCampaignEndDateShort() {
+  const [, month, day] = campaign.endDate.split("-");
+  return `${Number(month)}/${Number(day)}`;
+}
