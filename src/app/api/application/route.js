@@ -5,6 +5,7 @@
 // この関数の処理が終わると同時に（明示的な削除処理なしに）メモリから解放されます。
 
 import { company } from "@/data/site";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,10 @@ const TO_EMAIL = "pbkaitori@gmail.com";
 // スパム対策の「時間トラップ」。フロントエンドの判定だけに頼らず、
 // サーバー側でもフォーム表示時刻からの経過時間を検証する。
 const MIN_ELAPSED_MS = 3000;
+// 商品画像（仮査定）の枚数・合計サイズの上限。1枚あたりのサイズ・種類の制限とは別に、
+// 大量添付によるサーバー負荷・Resendへの巨大ペイロード送信を防ぐための上限。
+const MAX_IMAGE_COUNT = 20;
+const MAX_TOTAL_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB
 
 function courseLabel(course) {
   return course === "provisional"
@@ -48,6 +53,29 @@ export async function POST(request) {
     );
   }
 
+  // Cloudflare Turnstileの検証。TURNSTILE_SECRET_KEY未設定（ローカル開発等）の場合は
+  // src/lib/turnstile.js側でスキップされる。
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const remoteIp = forwardedFor ? forwardedFor.split(",")[0].trim() : undefined;
+  const turnstileResult = await verifyTurnstile(
+    formData.get("cf-turnstile-response"),
+    remoteIp
+  );
+  if (!turnstileResult.ok) {
+    const isServiceIssue =
+      turnstileResult.reason === "service-error" ||
+      turnstileResult.reason === "network-error";
+    return Response.json(
+      {
+        success: false,
+        error: isServiceIssue
+          ? "確認処理が混み合っています。時間をおいて再度お試しください。"
+          : "送信に失敗しました。もう一度お試しください。",
+      },
+      { status: 400 }
+    );
+  }
+
   const course = formData.get("course") === "provisional" ? "provisional" : "speed";
   const name = String(formData.get("name") || "");
   const email = String(formData.get("email") || "");
@@ -69,6 +97,31 @@ export async function POST(request) {
   if (course === "provisional" && productImages.length === 0) {
     return Response.json(
       { success: false, error: "商品の画像を1枚以上アップロードしてください。" },
+      { status: 400 }
+    );
+  }
+
+  // 商品画像の枚数上限。クライアント側のチェックをすり抜けた場合の保険。
+  if (productImages.length > MAX_IMAGE_COUNT) {
+    return Response.json(
+      {
+        success: false,
+        error: `商品の画像は${MAX_IMAGE_COUNT}枚までアップロードできます（現在${productImages.length}枚選択されています）。枚数を減らして再度お試しください。`,
+      },
+      { status: 400 }
+    );
+  }
+
+  // 商品画像の合計サイズ上限。同上。
+  const productImagesTotalSize = productImages.reduce((sum, f) => sum + f.size, 0);
+  if (productImagesTotalSize > MAX_TOTAL_IMAGE_SIZE) {
+    return Response.json(
+      {
+        success: false,
+        error: `商品の画像の合計サイズが大きすぎます（合計${
+          MAX_TOTAL_IMAGE_SIZE / 1024 / 1024
+        }MBまで）。枚数を減らすか画質を下げて再度お試しください。`,
+      },
       { status: 400 }
     );
   }

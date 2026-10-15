@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { trackEvent } from "@/lib/analytics";
+import Turnstile from "@/components/Turnstile";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
@@ -222,6 +223,8 @@ export default function ShippingConfirmForm() {
             </>
           )}
         </div>
+
+        <Turnstile />
 
         {status === "error" && (
           <p className="text-sm text-[#b3242b]">

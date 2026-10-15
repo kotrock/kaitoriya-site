@@ -6,6 +6,7 @@ import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions } from "@/data/site";
 import { trackEvent } from "@/lib/analytics";
+import Turnstile from "@/components/Turnstile";
 
 // スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
 // 短すぎる場合はbotによる自動送信とみなす。4ステップの入力・ファイル選択を
@@ -32,6 +33,10 @@ const paymentLabels = {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+// 商品画像（仮査定）の枚数・合計サイズの上限。src/app/api/application/route.jsの
+// サーバー側チェックと同じ値を使う。
+const MAX_IMAGE_COUNT = 20;
+const MAX_TOTAL_IMAGE_SIZE = 30 * 1024 * 1024;
 
 // GA4計測用の申込み点数。スピード買取はquantity、仮査定は内訳の合計（route.jsの
 // totalQuantity計算と同じロジック）。個人情報は含めない。
@@ -50,6 +55,7 @@ export default function ApplicationForm() {
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
   const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
   const [images, setImages] = useState([]);
+  const [imagesError, setImagesError] = useState("");
   const [selfiePhoto, setSelfiePhoto] = useState(null);
   const [idPhoto, setIdPhoto] = useState(null);
   const [paypayQrPhoto, setPaypayQrPhoto] = useState(null);
@@ -89,13 +95,21 @@ export default function ApplicationForm() {
     const invalid = files.find(
       (f) => !ALLOWED_TYPES.includes(f.type) || f.size > MAX_FILE_SIZE
     );
+    const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+
+    let message = "";
     if (invalid) {
-      input.setCustomValidity(
-        `「${invalid.name}」はjpg/png・10MB以内のファイルにしてください。`
-      );
-    } else {
-      input.setCustomValidity("");
+      message = `「${invalid.name}」はjpg/png・10MB以内のファイルにしてください。`;
+    } else if (files.length > MAX_IMAGE_COUNT) {
+      message = `商品の画像は${MAX_IMAGE_COUNT}枚まで選択できます（現在${files.length}枚）。枚数を減らしてください。`;
+    } else if (totalSize > MAX_TOTAL_IMAGE_SIZE) {
+      message = `商品の画像の合計サイズが大きすぎます（合計${
+        MAX_TOTAL_IMAGE_SIZE / 1024 / 1024
+      }MBまで、現在${(totalSize / 1024 / 1024).toFixed(1)}MB）。枚数や画質を減らしてください。`;
     }
+
+    input.setCustomValidity(message);
+    setImagesError(message);
     setImages(files);
   }
 
@@ -403,7 +417,7 @@ export default function ApplicationForm() {
               <Field
                 label="商品の画像"
                 required
-                hint="査定希望商品はすべて、背表紙が見える写真をアップロードしてください（品番確認のため）。画像がない商品は最低価格での査定となります。（jpg/png形式、1枚あたり10MBまで。複数枚選択できます。）"
+                hint="査定希望商品はすべて、背表紙が見える写真をアップロードしてください（品番確認のため）。画像がない商品は最低価格での査定となります。（jpg/png形式、1枚あたり10MBまで。最大20枚・合計30MBまで。）"
               >
                 <input
                   type="file"
@@ -415,6 +429,9 @@ export default function ApplicationForm() {
                   className={inputCls}
                 />
               </Field>
+              {imagesError && (
+                <p className="text-xs text-[#b3242b] -mt-3">{imagesError}</p>
+              )}
               {images.length > 0 && (
                 <ul className="text-xs text-[#5c554d] flex flex-col gap-1">
                   {images.map((f, i) => (
@@ -613,6 +630,7 @@ export default function ApplicationForm() {
             <input type="checkbox" required className="mt-0.5" />
             利用規約・プライバシーポリシーに同意の上、この内容で申し込みます。
           </label>
+          <Turnstile />
         </div>
 
         {status === "error" && (

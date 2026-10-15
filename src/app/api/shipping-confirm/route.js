@@ -5,6 +5,8 @@
 // APIに渡すだけで、この関数の処理が終わると同時に（明示的な削除処理なしに）
 // メモリから解放されます。
 
+import { verifyTurnstile } from "@/lib/turnstile";
+
 export const runtime = "nodejs";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -38,6 +40,29 @@ export async function POST(request) {
   if (!formLoadedAt || Date.now() - formLoadedAt < MIN_ELAPSED_MS) {
     return Response.json(
       { success: false, error: "送信に失敗しました。もう一度お試しください。" },
+      { status: 400 }
+    );
+  }
+
+  // Cloudflare Turnstileの検証。TURNSTILE_SECRET_KEY未設定（ローカル開発等）の場合は
+  // src/lib/turnstile.js側でスキップされる。
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const remoteIp = forwardedFor ? forwardedFor.split(",")[0].trim() : undefined;
+  const turnstileResult = await verifyTurnstile(
+    formData.get("cf-turnstile-response"),
+    remoteIp
+  );
+  if (!turnstileResult.ok) {
+    const isServiceIssue =
+      turnstileResult.reason === "service-error" ||
+      turnstileResult.reason === "network-error";
+    return Response.json(
+      {
+        success: false,
+        error: isServiceIssue
+          ? "確認処理が混み合っています。時間をおいて再度お試しください。"
+          : "送信に失敗しました。もう一度お試しください。",
+      },
       { status: 400 }
     );
   }
