@@ -9,16 +9,23 @@ import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+// Vercelのサーバーレス関数はリクエストボディが約4.5MBを超えると
+// プラットフォーム側で413 (FUNCTION_PAYLOAD_TOO_LARGE) として弾かれ、
+// こちらのエラーハンドリングより先に失敗する。そのため、ここでの上限は
+// Vercelの壁より手前（約4MB）に設定し、分かりやすい日本語エラーを
+// 先に返せるようにする。クライアント側（ApplicationForm.js）で画像を
+// 圧縮してから送信する前提の値。
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB（1枚あたり）
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 const TO_EMAIL = "pbkaitori@gmail.com";
 // スパム対策の「時間トラップ」。フロントエンドの判定だけに頼らず、
 // サーバー側でもフォーム表示時刻からの経過時間を検証する。
 const MIN_ELAPSED_MS = 3000;
-// 商品画像（仮査定）の枚数・合計サイズの上限。1枚あたりのサイズ・種類の制限とは別に、
-// 大量添付によるサーバー負荷・Resendへの巨大ペイロード送信を防ぐための上限。
+// 商品画像（仮査定）の枚数上限。大量添付によるサーバー負荷・Resendへの
+// 巨大ペイロード送信を防ぐための上限。
 const MAX_IMAGE_COUNT = 20;
-const MAX_TOTAL_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB
+// 添付ファイル（商品画像＋本人確認書類等）の合計サイズ上限。約4MB。
+const MAX_TOTAL_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
 
 function courseLabel(course) {
   return course === "provisional"
@@ -112,20 +119,6 @@ export async function POST(request) {
     );
   }
 
-  // 商品画像の合計サイズ上限。同上。
-  const productImagesTotalSize = productImages.reduce((sum, f) => sum + f.size, 0);
-  if (productImagesTotalSize > MAX_TOTAL_IMAGE_SIZE) {
-    return Response.json(
-      {
-        success: false,
-        error: `商品の画像の合計サイズが大きすぎます（合計${
-          MAX_TOTAL_IMAGE_SIZE / 1024 / 1024
-        }MBまで）。枚数を減らすか画質を下げて再度お試しください。`,
-      },
-      { status: 400 }
-    );
-  }
-
   const selfieFile = formData.get("selfie_photo");
   const idFile = formData.get("id_document_photo");
   const paypayQrFile = formData.get("paypay_qr_photo");
@@ -134,6 +127,22 @@ export async function POST(request) {
   );
 
   const allFiles = [...productImages, ...identityFiles];
+
+  // 添付ファイル（商品画像＋顔写真・身分証明書等）の合計サイズ上限。
+  // クライアント側で圧縮済みであることを前提としているが、すり抜けた場合の保険として
+  // Vercelのリクエストボディ上限（約4.5MB）に弾かれる前に分かりやすいエラーを返す。
+  const allFilesTotalSize = allFiles.reduce((sum, f) => sum + f.size, 0);
+  if (allFilesTotalSize > MAX_TOTAL_IMAGE_SIZE) {
+    return Response.json(
+      {
+        success: false,
+        error: `画像の合計サイズが大きすぎます（合計${
+          MAX_TOTAL_IMAGE_SIZE / 1024 / 1024
+        }MBまで）。枚数を減らして再度お試しください。`,
+      },
+      { status: 400 }
+    );
+  }
 
   for (const file of allFiles) {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -149,7 +158,9 @@ export async function POST(request) {
       return Response.json(
         {
           success: false,
-          error: `ファイルサイズが大きすぎます（1枚10MBまで）：${file.name}`,
+          error: `ファイルサイズが大きすぎます（1枚${
+            MAX_FILE_SIZE / 1024 / 1024
+          }MBまで）：${file.name}`,
         },
         { status: 400 }
       );

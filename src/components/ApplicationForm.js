@@ -7,6 +7,11 @@ import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions } from "@/data/site";
 import { trackEvent } from "@/lib/analytics";
 import Turnstile from "@/components/Turnstile";
+import {
+  compressImageToTarget,
+  compressImagesToBudget,
+  UnsupportedImageError,
+} from "@/lib/image-compression";
 
 // スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
 // 短すぎる場合はbotによる自動送信とみなす。4ステップの入力・ファイル選択を
@@ -31,12 +36,17 @@ const paymentLabels = {
   paypay: `PayPay受け取り（${payoutOptions.paypayBonus}プラス）`,
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// src/app/api/application/route.jsのサーバー側チェックと同じ値を使う。
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB（1枚あたり、圧縮後はほぼ下回る想定）
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
-// 商品画像（仮査定）の枚数・合計サイズの上限。src/app/api/application/route.jsの
-// サーバー側チェックと同じ値を使う。
 const MAX_IMAGE_COUNT = 20;
-const MAX_TOTAL_IMAGE_SIZE = 30 * 1024 * 1024;
+const MAX_TOTAL_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB（サーバー側上限と同じ）
+// 圧縮の目標値。Vercelのリクエストボディ上限（約4.5MB）・サーバー側上限（4MB）より
+// 少し余裕を持たせた約3.8MBを目標に、選択直後に自動で圧縮する。
+const COMPRESSION_TARGET_TOTAL = 3.8 * 1024 * 1024;
+// 顔写真・身分証明書・PayPay QRコードなど、1枚ずつ個別に選択される画像の目標サイズ。
+// 判読性を優先するため、商品画像より緩やかな目標値にする。
+const PRIORITY_FILE_TARGET = 1.2 * 1024 * 1024;
 
 // GA4計測用の申込み点数。スピード買取はquantity、仮査定は内訳の合計（route.jsの
 // totalQuantity計算と同じロジック）。個人情報は含めない。
@@ -51,11 +61,29 @@ function computeItemCount(formData, course) {
   return Number(formData.get("quantity")) || 0;
 }
 
+// 送信失敗時のGA4計測用に、エラーの種類をざっくり分類する（個人情報・本文は含めない）。
+function classifyError(status, message) {
+  if (status === 413) return "too_large";
+  if (status && status >= 500) return "server";
+  if (message && /サイズ|枚/.test(message)) return "too_large";
+  return "validation";
+}
+
+// 圧縮後のFileでネイティブのinput.filesを置き換える（DataTransfer経由。
+// モダンブラウザで共通してサポートされている方法）。これによりFormData送信時に
+// 実際に圧縮後のファイルが使われるようにする。
+function setInputFiles(input, files) {
+  const dataTransfer = new DataTransfer();
+  files.forEach((f) => dataTransfer.items.add(f));
+  input.files = dataTransfer.files;
+}
+
 export default function ApplicationForm() {
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
   const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
   const [images, setImages] = useState([]);
   const [imagesError, setImagesError] = useState("");
+  const [compressing, setCompressing] = useState(false);
   const [selfiePhoto, setSelfiePhoto] = useState(null);
   const [idPhoto, setIdPhoto] = useState(null);
   const [paypayQrPhoto, setPaypayQrPhoto] = useState(null);
@@ -89,44 +117,92 @@ export default function ApplicationForm() {
     return true;
   }
 
-  function handleImagesChange(e) {
+  async function handleImagesChange(e) {
     const input = e.target;
     const files = Array.from(input.files || []);
-    const invalid = files.find(
-      (f) => !ALLOWED_TYPES.includes(f.type) || f.size > MAX_FILE_SIZE
-    );
-    const totalSize = files.reduce((sum, f) => sum + f.size, 0);
 
-    let message = "";
-    if (invalid) {
-      message = `「${invalid.name}」はjpg/png・10MB以内のファイルにしてください。`;
-    } else if (files.length > MAX_IMAGE_COUNT) {
-      message = `商品の画像は${MAX_IMAGE_COUNT}枚まで選択できます（現在${files.length}枚）。枚数を減らしてください。`;
-    } else if (totalSize > MAX_TOTAL_IMAGE_SIZE) {
-      message = `商品の画像の合計サイズが大きすぎます（合計${
-        MAX_TOTAL_IMAGE_SIZE / 1024 / 1024
-      }MBまで、現在${(totalSize / 1024 / 1024).toFixed(1)}MB）。枚数や画質を減らしてください。`;
+    if (files.length === 0) {
+      input.setCustomValidity("");
+      setImagesError("");
+      setImages([]);
+      return;
     }
 
-    input.setCustomValidity(message);
-    setImagesError(message);
-    setImages(files);
+    if (files.length > MAX_IMAGE_COUNT) {
+      const message = `商品の画像は${MAX_IMAGE_COUNT}枚まで選択できます（現在${files.length}枚）。枚数を減らしてください。`;
+      input.setCustomValidity(message);
+      setImagesError(message);
+      setImages([]);
+      return;
+    }
+
+    setCompressing(true);
+    setImagesError("");
+    try {
+      const compressed = await compressImagesToBudget(files, {
+        totalBudget: COMPRESSION_TARGET_TOTAL,
+        priority: false,
+      });
+      const totalSize = compressed.reduce((sum, f) => sum + f.size, 0);
+      const message =
+        totalSize > MAX_TOTAL_IMAGE_SIZE
+          ? `商品の画像の合計サイズが大きすぎます（圧縮後も合計${(
+              totalSize /
+              1024 /
+              1024
+            ).toFixed(1)}MB）。枚数を減らして再度お試しください。`
+          : "";
+      input.setCustomValidity(message);
+      setImagesError(message);
+      setInputFiles(input, compressed);
+      setImages(compressed);
+    } catch (err) {
+      const message =
+        err instanceof UnsupportedImageError
+          ? err.message
+          : "画像の処理中にエラーが発生しました。別の画像でお試しください。";
+      input.setCustomValidity(message);
+      setImagesError(message);
+      setImages([]);
+    } finally {
+      setCompressing(false);
+    }
   }
 
-  function handleSingleFileChange(e, setPhoto) {
+  async function handleSingleFileChange(e, setPhoto) {
     const input = e.target;
     const file = input.files?.[0] || null;
-    if (file && (!ALLOWED_TYPES.includes(file.type) || file.size > MAX_FILE_SIZE)) {
-      input.setCustomValidity(
-        `「${file.name}」はjpg/png・10MB以内のファイルにしてください。`
-      );
-    } else {
+
+    if (!file) {
       input.setCustomValidity("");
+      setPhoto(null);
+      return;
     }
-    setPhoto(file);
+
+    setCompressing(true);
+    try {
+      // 顔写真・身分証明書・PayPay QRコードは、判読性を優先する「priority」扱いで圧縮する。
+      const compressed = await compressImageToTarget(file, {
+        targetSize: PRIORITY_FILE_TARGET,
+        priority: true,
+      });
+      input.setCustomValidity("");
+      setInputFiles(input, [compressed]);
+      setPhoto(compressed);
+    } catch (err) {
+      const message =
+        err instanceof UnsupportedImageError
+          ? err.message
+          : "画像の処理中にエラーが発生しました。別の画像でお試しください。";
+      input.setCustomValidity(message);
+      setPhoto(null);
+    } finally {
+      setCompressing(false);
+    }
   }
 
   function goNext() {
+    if (compressing) return;
     const currentEl = stepRefs[step]?.current;
     if (!validateStep(currentEl)) return;
     if (step === 2) {
@@ -158,30 +234,73 @@ export default function ApplicationForm() {
       return;
     }
 
+    // 画像処理中は送信しない（ボタン自体も無効化しているが念のための二重ガード）。
+    if (compressing) return;
+
     setStatus("sending");
     setErrorMessage("");
 
     const formData = new FormData(e.target);
 
+    let res;
     try {
-      const res = await fetch("/api/application", {
+      res = await fetch("/api/application", {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
-      if (data.success) {
-        setStatus("sent");
-        trackEvent("generate_lead", {
-          form_name: "application",
-          course,
-          item_count: computeItemCount(formData, course),
-        });
-      } else {
-        setStatus("error");
-        setErrorMessage(data.error || "");
-      }
     } catch {
+      // fetch自体が失敗（オフライン等）。レスポンスを受け取れていない。
       setStatus("error");
+      setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
+      trackEvent("generate_lead_error", {
+        form_name: "application",
+        error_type: "network",
+      });
+      return;
+    }
+
+    // Vercelの413 (リクエストボディが大きすぎる場合) はJSONではないため、
+    // res.json()を試みる前にステータスで判定する。
+    if (res.status === 413) {
+      setStatus("error");
+      setErrorMessage(
+        "画像の合計サイズが大きすぎます。枚数を減らして再度お試しください。"
+      );
+      trackEvent("generate_lead_error", {
+        form_name: "application",
+        error_type: "too_large",
+      });
+      return;
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      // JSONでない予期しないレスポンス（プラットフォーム側のエラーページ等）。
+      setStatus("error");
+      setErrorMessage("");
+      trackEvent("generate_lead_error", {
+        form_name: "application",
+        error_type: classifyError(res.status, null),
+      });
+      return;
+    }
+
+    if (data.success) {
+      setStatus("sent");
+      trackEvent("generate_lead", {
+        form_name: "application",
+        course,
+        item_count: computeItemCount(formData, course),
+      });
+    } else {
+      setStatus("error");
+      setErrorMessage(data.error || "");
+      trackEvent("generate_lead_error", {
+        form_name: "application",
+        error_type: classifyError(res.status, data.error),
+      });
     }
   }
 
@@ -417,7 +536,7 @@ export default function ApplicationForm() {
               <Field
                 label="商品の画像"
                 required
-                hint="査定希望商品はすべて、背表紙が見える写真をアップロードしてください（品番確認のため）。画像がない商品は最低価格での査定となります。（jpg/png形式、1枚あたり10MBまで。最大20枚・合計30MBまで。）"
+                hint="査定希望商品はすべて、背表紙が見える写真をアップロードしてください（品番確認のため）。画像がない商品は最低価格での査定となります。（jpg/png形式、最大20枚まで。選択した画像は自動的に圧縮してから送信します。）"
               >
                 <input
                   type="file"
@@ -633,6 +752,13 @@ export default function ApplicationForm() {
           <Turnstile />
         </div>
 
+        {compressing && (
+          <p className="text-xs text-[#726b5e] flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 border-2 border-[#b3242b] border-t-transparent rounded-full animate-spin" />
+            画像を処理しています…
+          </p>
+        )}
+
         {status === "error" && (
           <p className="text-sm text-[#b3242b]">
             {errorMessage ||
@@ -654,14 +780,15 @@ export default function ApplicationForm() {
             <button
               type="button"
               onClick={goNext}
-              className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22]"
+              disabled={compressing}
+              className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
             >
-              次へ
+              {compressing ? "画像を処理しています…" : "次へ"}
             </button>
           ) : (
             <button
               type="submit"
-              disabled={status === "sending"}
+              disabled={status === "sending" || compressing}
               className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
             >
               {status === "sending" ? "送信中…" : "この内容で申し込む"}
