@@ -1,32 +1,37 @@
 import PageHero from "@/components/PageHero";
-import Link from "next/link";
-import { firstTimeBonus, campaign, ogImage } from "@/data/site";
+import TrackedLink from "@/components/TrackedLink";
+import { campaign, ogImage } from "@/data/site";
 import { isCampaignActive } from "@/lib/campaign";
-
-const title = `初めてのご利用で査定額+${firstTimeBonus}キャンペーン | アダルトDVD高価買取の高買屋`;
-const description =
-  "初めてご利用の方限定で査定額に1,000円を上乗せするキャンペーンのご案内です。対象条件・注意事項をご確認ください。";
 
 // キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
 // 静的生成のまま固定化せず、短い間隔でISR再生成する。
 export const revalidate = 60;
 
-export const metadata = {
-  title,
-  description,
-  alternates: {
-    canonical: "/campaign",
-  },
-  openGraph: {
+// title/descriptionはキャンペーンの金額表記を含むため、isCampaignActive()の結果に
+// 連動させる必要がある。静的なmetadataオブジェクトではビルド時の値に固定されて
+// しまうため、generateMetadata()でページ本体と同じロジックを使って都度評価する。
+export async function generateMetadata() {
+  const bonus = isCampaignActive() ? campaign.campaignBonus : campaign.normalBonus;
+  const title = `初めてのご利用で査定額+${bonus}キャンペーン | アダルトDVD高価買取の高買屋`;
+  const description = `初めてご利用の方限定で査定額に${bonus}を上乗せするキャンペーンのご案内です。対象条件・注意事項をご確認ください。`;
+
+  return {
     title,
     description,
-    url: "/campaign",
-    siteName: "高買屋",
-    locale: "ja_JP",
-    type: "website",
-    images: [{ ...ogImage, alt: title }],
-  },
-};
+    alternates: {
+      canonical: "/campaign",
+    },
+    openGraph: {
+      title,
+      description,
+      url: "/campaign",
+      siteName: "高買屋",
+      locale: "ja_JP",
+      type: "website",
+      images: [{ ...ogImage, alt: title }],
+    },
+  };
+}
 
 const conditions = [
   "当社をはじめてご利用の方（お電話番号・お名前・ご住所のいずれかが過去のご利用情報と一致する場合は対象外）",
@@ -84,6 +89,14 @@ export default function CampaignPage() {
             </ul>
           </div>
 
+          <TrackedLink
+            href="/application"
+            cta_location="campaign_mid"
+            className="bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full text-center hover:bg-[#8f1c22] transition-colors"
+          >
+            この内容で無料査定を申し込む
+          </TrackedLink>
+
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#726b5e] leading-relaxed">
               ※{campaignActive ? campaign.campaignBonus : campaign.normalBonus}
@@ -95,12 +108,13 @@ export default function CampaignPage() {
             </p>
           </div>
 
-          <Link
+          <TrackedLink
             href="/application"
+            cta_location="campaign_page"
             className="bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full text-center hover:bg-[#8f1c22] transition-colors"
           >
             この内容で無料査定を申し込む
-          </Link>
+          </TrackedLink>
         </div>
       </section>
     </>

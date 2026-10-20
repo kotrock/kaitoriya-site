@@ -1,5 +1,5 @@
-import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import TrackedLink from "@/components/TrackedLink";
 import { faqs, campaign, ogImage } from "@/data/site";
 import { isCampaignActive } from "@/lib/campaign";
 
@@ -69,6 +69,15 @@ export default function FaqPage() {
         lead="お客様からよせられる、よくあるご質問をまとめました。お問い合わせの前に、こちらをご確認ください。"
       />
       <section className="w-full px-6 md:px-8 py-14">
+        <div className="max-w-[800px] mx-auto text-center mb-8">
+          <TrackedLink
+            href="/application"
+            cta_location="faq_top"
+            className="inline-block bg-[#b3242b] text-white text-sm font-bold py-3.5 px-8 rounded-full hover:bg-[#8f1c22]"
+          >
+            今すぐ無料査定を申し込む
+          </TrackedLink>
+        </div>
         <div className="max-w-[800px] mx-auto flex flex-col gap-3.5">
           {effectiveFaqs.map((faq) => (
             <div
@@ -87,12 +96,13 @@ export default function FaqPage() {
           ))}
         </div>
         <div className="max-w-[800px] mx-auto text-center mt-10">
-          <Link
+          <TrackedLink
             href="/application"
+            cta_location="faq_page"
             className="inline-block bg-[#b3242b] text-white text-sm font-bold py-3.5 px-8 rounded-full hover:bg-[#8f1c22]"
           >
             今すぐ無料査定を申し込む
-          </Link>
+          </TrackedLink>
         </div>
       </section>
     </>

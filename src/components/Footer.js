@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TrackedLink from "@/components/TrackedLink";
 import { company, footerLinks } from "@/data/site";
 
 export default function Footer() {
@@ -17,6 +18,13 @@ export default function Footer() {
               <br />
               TEL：{company.phone}（受付 {company.phoneHours}）
             </div>
+            <TrackedLink
+              href="/application"
+              cta_location="footer"
+              className="inline-block mt-3 text-xs font-bold text-[#e8a97a] hover:text-white hover:underline"
+            >
+              無料査定を申し込む →
+            </TrackedLink>
           </div>
           <div className="flex gap-8 text-xs flex-wrap">
             {footerLinks.map((link) => (

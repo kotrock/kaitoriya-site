@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import TrackedLink from "@/components/TrackedLink";
 import { nav, company } from "@/data/site";
 import { PhoneIcon } from "@/components/Icons";
 
@@ -50,12 +51,14 @@ export default function Header() {
             <PhoneIcon className="w-4 h-4" />
             {company.phone}
           </a>
-          <Link
+          <TrackedLink
             href="/application"
-            className="hidden sm:inline-block bg-[#b3242b] text-white text-[13px] font-bold py-3 px-5 rounded-full whitespace-nowrap hover:bg-[#8f1c22] transition-colors"
+            cta_location="header"
+            className="inline-flex items-center bg-[#b3242b] text-white text-xs sm:text-[13px] font-bold py-2.5 px-3.5 sm:py-3 sm:px-5 rounded-full whitespace-nowrap hover:bg-[#8f1c22] transition-colors"
           >
-            無料査定を申し込む
-          </Link>
+            <span className="sm:hidden">無料査定</span>
+            <span className="hidden sm:inline">無料査定を申し込む</span>
+          </TrackedLink>
 
           {/* モバイル用メニューボタン。lg以上では非表示 */}
           <button

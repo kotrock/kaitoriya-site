@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import TrackedLink from "@/components/TrackedLink";
 import {
   labels,
   trustItems,
@@ -96,12 +97,13 @@ export default function Home() {
             エスワン・ムーディーズ・マドンナ・FALENOなどの人気レーベルを強化買取中。査定は何本でも無料、個人情報は厳重に管理いたします。
           </p>
           <div className="flex gap-3.5 mt-2 flex-wrap justify-center">
-            <Link
+            <TrackedLink
               href="/application"
+              cta_location="hero"
               className="bg-[#b3242b] text-white text-[15px] font-bold py-4 px-8 rounded-full hover:bg-[#8f1c22] transition-colors shadow-[0_8px_24px_rgba(179,36,43,0.35)]"
             >
               今すぐ無料査定を申し込む
-            </Link>
+            </TrackedLink>
             <Link
               href="/recycle"
               className="bg-transparent border border-white/35 text-white text-[15px] font-bold py-4 px-8 rounded-full hover:bg-white/10 transition-colors"
@@ -618,12 +620,13 @@ export default function Home() {
           <p className="text-[13px] text-white/85">
             5本以上から買取可能・査定は何度でも無料・お申し込みから最短当日でご連絡
           </p>
-          <Link
+          <TrackedLink
             href="/application"
+            cta_location="hero_bottom"
             className="bg-white text-[#b3242b] text-base font-extrabold py-4.5 px-11 rounded-full hover:bg-[#f7f3ee] transition-colors"
           >
             買取申込フォームへ進む
-          </Link>
+          </TrackedLink>
           <a
             href={`tel:${company.phoneTel}`}
             className="text-[13px] text-white/85 hover:text-white underline decoration-white/40"

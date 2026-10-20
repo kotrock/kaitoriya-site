@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import TrackedLink from "@/components/TrackedLink";
 import { StarRating } from "@/components/Icons";
 import { voices } from "@/data/site";
 
@@ -40,12 +41,13 @@ export default function UserVoicePage() {
             <h2 className="text-xl font-extrabold text-[#26221e]">
               迷っている暇なし！まずは簡単お申込み
             </h2>
-            <Link
+            <TrackedLink
               href="/application"
+              cta_location="user_voice_page"
               className="bg-[#b3242b] text-white text-sm font-bold py-4 px-9 rounded-full hover:bg-[#8f1c22]"
             >
               今すぐ簡単DVD無料査定 &gt;&gt;
-            </Link>
+            </TrackedLink>
           </div>
 
           <div className="bg-[#26221e] rounded-2xl px-8 py-10 flex items-center justify-between gap-6 flex-wrap">

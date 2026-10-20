@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import TrackedLink from "@/components/TrackedLink";
 import { CheckCircleIcon } from "@/components/Icons";
 import { siteUrl, company, payoutOptions, campaign, ogImage } from "@/data/site";
 import { isCampaignActive } from "@/lib/campaign";
@@ -124,7 +125,7 @@ function CampaignNotice({ active }) {
     );
   }
   return (
-    <div className="bg-gradient-to-b from-[#b3242b] to-[#8f1c22] rounded-2xl p-5 text-white flex flex-col gap-1.5">
+    <div className="bg-gradient-to-b from-[#b3242b] to-[#8f1c22] rounded-2xl p-4 text-white flex flex-col gap-1">
       <p className="text-sm font-bold leading-relaxed">
         今なら期間限定！初めての方は買取額
         <del className="text-white/55 decoration-2 ml-1">
@@ -146,14 +147,15 @@ function CampaignNotice({ active }) {
   );
 }
 
-function ApplyCta() {
+function ApplyCta({ cta_location }) {
   return (
-    <Link
+    <TrackedLink
       href="/application"
+      cta_location={cta_location}
       className="bg-[#b3242b] text-white text-sm font-bold py-4 px-6 rounded-full text-center hover:bg-[#8f1c22] transition-colors"
     >
       まずは仮査定から。写真を送るだけで金額が分かります
-    </Link>
+    </TrackedLink>
   );
 }
 
@@ -239,42 +241,46 @@ export default function AdultDvdKaitoriTakakuUruPage() {
         }}
       />
       <PageHero eyebrow="COLUMN" title={h1Title} />
-      <section className="w-full px-6 md:px-8 py-14">
+      <section className="w-full px-6 md:px-8 py-8 md:py-14">
         <article className="max-w-[700px] mx-auto flex flex-col gap-10">
-          <nav
-            aria-label="パンくずリスト"
-            className="-mt-4 flex flex-wrap items-center gap-1.5 text-xs text-[#726b5e]"
-          >
-            <Link href="/" className="hover:text-[#b3242b] hover:underline">
-              ホーム
-            </Link>
-            <span>›</span>
-            <Link
-              href="/column"
-              className="hover:text-[#b3242b] hover:underline"
+          {/* 冒頭クラスタ（パンくず〜最初のCTA）はarticle全体のgap-10より詰めて、
+              スマホのファーストビュー内にCTAが収まるようにする。 */}
+          <div className="flex flex-col gap-4 sm:gap-5">
+            <nav
+              aria-label="パンくずリスト"
+              className="-mt-4 flex flex-wrap items-center gap-1.5 text-xs text-[#726b5e]"
             >
-              コラム
-            </Link>
-            <span>›</span>
-            <span>アダルトDVDはどこで売るのが正解？</span>
-          </nav>
+              <Link href="/" className="hover:text-[#b3242b] hover:underline">
+                ホーム
+              </Link>
+              <span>›</span>
+              <Link
+                href="/column"
+                className="hover:text-[#b3242b] hover:underline"
+              >
+                コラム
+              </Link>
+              <span>›</span>
+              <span>アダルトDVDはどこで売るのが正解？</span>
+            </nav>
 
-          <div className="flex flex-col gap-4">
-            <p className="text-sm leading-loose text-[#5c554d]">
-              <strong className="text-[#26221e]">
-                結論から言うと、まとめて売るなら「アダルト専門の宅配買取」がおすすめです。
-              </strong>
-              フリマやオークションは手間や出品ルールのハードルがあり、リサイクル店は店舗ごとに取扱いが違うためです。
-            </p>
-            <p className="text-sm leading-loose text-[#5c554d]">
-              この記事では、パラダイスBOX公式の買取サービス「{company.name}
-              」が、売る場所4つの違いと、失敗しない選び方を解説します。
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm leading-loose text-[#5c554d]">
+                <strong className="text-[#26221e]">
+                  結論から言うと、まとめて売るなら「アダルト専門の宅配買取」がおすすめです。
+                </strong>
+                フリマやオークションは手間や出品ルールのハードルがあり、リサイクル店は店舗ごとに取扱いが違うためです。
+              </p>
+              <p className="text-sm leading-loose text-[#5c554d]">
+                この記事では、パラダイスBOX公式の買取サービス「{company.name}
+                」が、売る場所4つの違いと、失敗しない選び方を解説します。
+              </p>
+            </div>
+
+            <CampaignNotice active={campaignActive} />
+
+            <ApplyCta cta_location="article_top" />
           </div>
-
-          <CampaignNotice active={campaignActive} />
-
-          <ApplyCta />
 
           <nav
             aria-label="目次"
@@ -511,7 +517,7 @@ export default function AdultDvdKaitoriTakakuUruPage() {
                 {company.antiqueLicense}）
               </li>
             </ul>
-            <ApplyCta />
+            <ApplyCta cta_location="article_mid" />
           </section>
 
           <section id="tips" className="flex flex-col gap-5">
@@ -624,7 +630,7 @@ export default function AdultDvdKaitoriTakakuUruPage() {
             ))}
           </section>
 
-          <ApplyCta />
+          <ApplyCta cta_location="article_end" />
 
           <div className="bg-white border border-[#ece6dc] rounded-2xl p-6 flex flex-col gap-3">
             <h2 className="text-base font-bold text-[#26221e]">関連ページ</h2>
@@ -646,12 +652,13 @@ export default function AdultDvdKaitoriTakakuUruPage() {
                 </Link>
               </li>
               <li>
-                <Link
+                <TrackedLink
                   href="/application"
+                  cta_location="article_related"
                   className="text-[#b3242b] font-bold hover:underline"
                 >
                   買取お申込みフォーム →
-                </Link>
+                </TrackedLink>
               </li>
               <li>
                 <Link
