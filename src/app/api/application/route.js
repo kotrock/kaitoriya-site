@@ -111,7 +111,7 @@ export async function POST(request) {
       return Response.json(
         {
           success: false,
-          error: `買取は、アダルトDVD・ブルーレイ合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`,
+          error: `買取は、アダルトDVD・ブルーレイ（イメージDVD・BD含む）合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`,
         },
         { status: 400 }
       );

@@ -38,6 +38,14 @@ const paymentLabels = {
   paypay: `PayPay受け取り（${payoutOptions.paypayBonus}プラス）`,
 };
 
+// 仮査定申請の「買取点数の内訳」4項目。ラベルの高さ・単位の位置をそろえて表示する。
+const QUANTITY_FIELDS = [
+  { name: "dvd_count", label: "DVD", unit: "本" },
+  { name: "bd_count", label: "ブルーレイ", unit: "本" },
+  { name: "comic_count", label: "コミック", unit: "冊" },
+  { name: "other_count", label: "その他（イメージDVD/BD等）", unit: "点" },
+];
+
 // src/app/api/application/route.jsのサーバー側チェックと同じ値を使う。
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB（1枚あたり、圧縮後はほぼ下回る想定）
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
@@ -101,8 +109,15 @@ export default function ApplicationForm() {
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
   const step2Ref = useRef(null);
+  const quantityErrorRef = useRef(null);
 
   const stepRefs = [step0Ref, step1Ref, step2Ref];
+
+  useEffect(() => {
+    if (quantityError) {
+      quantityErrorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [quantityError]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -219,7 +234,7 @@ export default function ApplicationForm() {
     if (meetsMinimum) return null;
     const displayCount = mainCount > 0 ? mainCount : comicCountNum;
     const unit = mainCount > 0 ? "本" : "冊";
-    return `買取は、アダルトDVD・ブルーレイ合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`;
+    return `買取は、アダルトDVD・ブルーレイ（イメージDVD・BD含む）合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`;
   }
 
   function goNext() {
@@ -454,58 +469,26 @@ export default function ApplicationForm() {
                 アダルトDVD・ブルーレイ・イメージDVD/BD（「その他」にご記入ください）は合計5本以上、コミックのみの場合は10冊以上からお申し込みいただけます。わかる範囲で内訳をご記入ください。
               </span>
               <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[#5c554d]">
-                    DVD本数
-                  </span>
-                  <input
-                    type="number"
-                    name="dvd_count"
-                    min={0}
-                    onChange={() => setQuantityError("")}
-                    className={inputCls}
-                  />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[#5c554d]">
-                    ブルーレイ本数
-                  </span>
-                  <input
-                    type="number"
-                    name="bd_count"
-                    min={0}
-                    onChange={() => setQuantityError("")}
-                    className={inputCls}
-                  />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[#5c554d]">
-                    コミック冊数
-                  </span>
-                  <input
-                    type="number"
-                    name="comic_count"
-                    min={0}
-                    onChange={() => setQuantityError("")}
-                    className={inputCls}
-                  />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[#5c554d]">
-                    その他（イメージDVD/BD等。点数）
-                  </span>
-                  <input
-                    type="number"
-                    name="other_count"
-                    min={0}
-                    onChange={() => setQuantityError("")}
-                    className={inputCls}
-                  />
-                </label>
+                {QUANTITY_FIELDS.map((field) => (
+                  <label key={field.name} className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-[#5c554d] min-h-[2rem] flex items-end">
+                      {field.label}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        name={field.name}
+                        min={0}
+                        onChange={() => setQuantityError("")}
+                        className={`${inputCls} flex-1 min-w-0`}
+                      />
+                      <span className="text-xs text-[#726b5e] shrink-0">
+                        {field.unit}
+                      </span>
+                    </span>
+                  </label>
+                ))}
               </div>
-              {quantityError && (
-                <p className="text-xs text-[#b3242b]">{quantityError}</p>
-              )}
               <span className="text-xs text-[#726b5e]">
                 本人確認書類は申込み時には不要です。仮査定にご納得いただいた後、「発送確定フォーム」で身分証明書の写真のみご提出いただきます（顔写真は不要です）。
               </span>
@@ -513,7 +496,7 @@ export default function ApplicationForm() {
           ) : (
             <Field
               label="買取希望商品の本数"
-              hint="アダルトDVD・ブルーレイは5本以上、コミックのみの場合は10冊以上から買取可能です。"
+              hint="アダルトDVD・ブルーレイは5本以上から買取可能です。コミックのみ（10冊以上）のお申し込みは、仮査定申請をご利用ください。"
               required
             >
               <input
@@ -822,6 +805,16 @@ export default function ApplicationForm() {
           <p className="text-sm text-[#b3242b]">
             {errorMessage ||
               "送信に失敗しました。お手数ですがお電話(022-343-1588)でもお問い合わせいただけます。"}
+          </p>
+        )}
+
+        {step === 1 && quantityError && (
+          <p
+            ref={quantityErrorRef}
+            role="alert"
+            className="text-xs text-[#b3242b] font-semibold"
+          >
+            {quantityError}
           </p>
         )}
 
