@@ -77,6 +77,14 @@ export const boxBonus = {
   oldMinCount: 10,
 };
 
+// 初めてのご利用で買取対象商品がminCount本以上の場合の、特典を含めた買取金額の最低保証。
+// 査定額＋特典の合計がamountに満たない場合のみamountまで引き上げる（特典に加えて
+// さらに上乗せするものではない）。newBonusConditionsと同じ適用期間（〜2026-12-31）。
+export const minimumGuarantee = {
+  amount: "1,000円",
+  minCount: 5,
+};
+
 export const nav = [
   { href: "/#price", label: "買取価格表" },
   { href: "/recycle", label: "DVD無料回収" },
@@ -313,6 +321,10 @@ export const faqs = [
   {
     q: "少ない本数でも特典はありますか？",
     a: `はい。2026年12月31日までの期間限定で、初めてご利用の方は${firstTimeBonusTiers.tier1.minCount}本から特典の対象になりました。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）です。ディスクのみ・レンタル落ち品は対象外、セット商品は点数に関わらず1点としてカウントします。`,
+  },
+  {
+    q: "査定額が低くても最低金額は保証されますか？",
+    a: `はい。2026年12月31日までの期間限定で、初めてご利用の方が買取対象商品${minimumGuarantee.minCount}本以上をご発送いただいた場合、特典を含めた買取金額が最低${minimumGuarantee.amount}になるよう保証いたします（査定額と特典の合計が${minimumGuarantee.amount}に満たない場合のみ${minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません）。お一人様1回限り、査定できない商品（コピー品・状態不良など）は本数に含みません。買取対象商品が${minimumGuarantee.minCount}本未満になった場合は対象外です。`,
   },
   {
     q: "セット商品は何点として数えますか？",

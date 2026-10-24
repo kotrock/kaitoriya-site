@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { priceTiers, AVG_PRICE_LOW, AVG_PRICE_HIGH } from "@/data/site";
+import { priceTiers, AVG_PRICE_LOW, AVG_PRICE_HIGH, minimumGuarantee } from "@/data/site";
 
 const yen = new Intl.NumberFormat("ja-JP");
 
@@ -250,6 +250,9 @@ export default function PriceSimulator() {
       </p>
       <p className="text-xs text-[#726b5e] leading-relaxed">
         ※同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。
+      </p>
+      <p className="text-xs text-[#726b5e] leading-relaxed">
+        ※初めてのご利用で{minimumGuarantee.minCount}本以上の場合は、特典を含めた買取金額が最低{minimumGuarantee.amount}になります（条件あり）。
       </p>
 
       <Link

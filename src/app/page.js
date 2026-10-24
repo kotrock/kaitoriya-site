@@ -15,6 +15,7 @@ import {
   campaign,
   firstTimeBonusTiers,
   boxBonus,
+  minimumGuarantee,
   storeVisit,
 } from "@/data/site";
 import {
@@ -192,6 +193,9 @@ export default function Home() {
             {campaignActive && "（期間限定）"}／段ボール持参+{boxBonus.amount}
             <span className="block sm:inline sm:ml-1 text-[11px] text-[#9a9386]">
               〜{getNewBonusConditionsEndDateLong()}まで
+            </span>
+            <span className="block mt-1 text-[11px] text-[#9a9386]">
+              {minimumGuarantee.minCount}本以上なら特典込みの買取金額を最低{minimumGuarantee.amount}保証（条件あり）
             </span>
           </p>
         </div>

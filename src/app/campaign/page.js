@@ -1,7 +1,13 @@
 import PageHero from "@/components/PageHero";
 import TrackedLink from "@/components/TrackedLink";
 import ReassurancePoints from "@/components/ReassurancePoints";
-import { campaign, firstTimeBonusTiers, boxBonus, ogImage } from "@/data/site";
+import {
+  campaign,
+  firstTimeBonusTiers,
+  boxBonus,
+  minimumGuarantee,
+  ogImage,
+} from "@/data/site";
 import {
   isCampaignActive,
   getCurrentBonus,
@@ -149,6 +155,9 @@ export default function CampaignPage() {
             </div>
             <p className="text-xs text-[#726b5e] leading-relaxed">
               ※発送用の段ボールをご自身でご用意いただく場合は、別途{boxBonus.amount}の特典があります（ディスクのみ・レンタル品等を除く{getBoxBonusMinCount()}点以上が対象、〜{getNewBonusConditionsEndDateLong()}まで）。
+            </p>
+            <p className="text-xs text-[#726b5e] leading-relaxed">
+              ※買取対象商品{minimumGuarantee.minCount}本以上の場合、特典を含めた買取金額が最低{minimumGuarantee.amount}になるよう保証いたします（査定額と特典の合計が{minimumGuarantee.amount}に満たない場合のみ{minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません。査定できない商品は本数に含みません、〜{getNewBonusConditionsEndDateLong()}まで）。
             </p>
           </div>
 
