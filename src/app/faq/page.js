@@ -1,6 +1,6 @@
 import PageHero from "@/components/PageHero";
 import TrackedLink from "@/components/TrackedLink";
-import { faqs, campaign, ogImage } from "@/data/site";
+import { faqs, campaign, firstTimeBonusTiers, ogImage } from "@/data/site";
 import { isCampaignActive } from "@/lib/campaign";
 
 const title = "よくある質問 | アダルトDVD高価買取の高買屋";
@@ -8,8 +8,7 @@ const description =
   "お客様からよせられる、よくあるご質問をまとめました。お問い合わせの前に、こちらをご確認ください。";
 
 // 初回キャンペーンに関するFAQの回答は、キャンペーン期間中だけ金額を差し替える。
-const CAMPAIGN_FAQ_QUESTION =
-  "「初めての方は査定額+1,000円」とはどういうキャンペーンですか？";
+const CAMPAIGN_FAQ_QUESTION = "初めてのご利用特典とは、どのようなキャンペーンですか？";
 
 // キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
 // 静的生成のまま固定化せず、短い間隔でISR再生成する。
@@ -38,7 +37,7 @@ export default function FaqPage() {
     if (faq.q !== CAMPAIGN_FAQ_QUESTION || !campaignActive) return faq;
     return {
       ...faq,
-      a: `当社を初めてご利用いただく方が、10点（本）以上をまとめてご発送いただいた場合、査定額に通常${campaign.normalBonus}のところ、期間限定で${campaign.campaignBonus}を上乗せするキャンペーンです（現在開催中）。ディスクのみ・レンタル落ち品は対象外です。セット商品（2枚組・3枚組等）は点数に関わらず1点としてカウントします。詳しい条件はキャンペーンページをご確認ください。`,
+      a: `当社を初めてご利用いただく方（お一人様1回限り）が対象です。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で通常${campaign.normalBonus}のところ、期間限定で${campaign.campaignBonus}を上乗せするキャンペーンです（現在開催中）。ディスクのみ・レンタル落ち品は対象外です。セット商品（2枚組・3枚組等）は点数に関わらず1点としてカウントします。詳しい条件はキャンペーンページをご確認ください。`,
     };
   });
 

@@ -1,7 +1,13 @@
 import PageHero from "@/components/PageHero";
 import TrackedLink from "@/components/TrackedLink";
-import { campaign, ogImage } from "@/data/site";
-import { isCampaignActive } from "@/lib/campaign";
+import ReassurancePoints from "@/components/ReassurancePoints";
+import { campaign, firstTimeBonusTiers, boxBonus, ogImage } from "@/data/site";
+import {
+  isCampaignActive,
+  getCurrentBonus,
+  getNewBonusConditionsEndDateLong,
+  getBoxBonusMinCount,
+} from "@/lib/campaign";
 
 // キャンペーン有無はリクエスト時点の日付で判定する必要があるため、このページは
 // 静的生成のまま固定化せず、短い間隔でISR再生成する。
@@ -34,8 +40,8 @@ export async function generateMetadata() {
 }
 
 const conditions = [
-  "当社をはじめてご利用の方（お電話番号・お名前・ご住所のいずれかが過去のご利用情報と一致する場合は対象外）",
-  "1回のご発送につき、対象商品10点（本）以上",
+  "当社をはじめてご利用の方（お一人様1回限り。お電話番号・お名前・ご住所のいずれかが過去のご利用情報と一致する場合は対象外）",
+  `1回のご発送につき、対象商品${firstTimeBonusTiers.tier1.minCount}点（本）以上（本数ごとの特典額は下記表のとおり）`,
   "ケース・ジャケットのない「ディスクのみ」の商品は対象外",
   "レンタル落ち品（レンタル用シール・貸出穴等があるもの）は対象外",
   "2枚組・3枚組などのセット商品は、点数に関わらず1点としてカウント",
@@ -44,6 +50,16 @@ const conditions = [
 
 export default function CampaignPage() {
   const campaignActive = isCampaignActive();
+  const bonusRows = [
+    {
+      count: `${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本`,
+      bonus: `+${firstTimeBonusTiers.tier1.bonus}`,
+    },
+    {
+      count: `${firstTimeBonusTiers.tier2.minCount}本以上`,
+      bonus: `+${getCurrentBonus()}${campaignActive ? "（期間限定）" : ""}`,
+    },
+  ];
 
   return (
     <>
@@ -89,6 +105,53 @@ export default function CampaignPage() {
             </ul>
           </div>
 
+          <div className="bg-white border border-[#ece6dc] rounded-2xl p-8 flex flex-col gap-4">
+            <div>
+              <h2 className="text-base font-bold text-[#26221e]">
+                特典額（本数ごと）
+              </h2>
+              <p className="text-xs text-[#726b5e] mt-1">
+                {firstTimeBonusTiers.tier1.minCount}本からの特典拡大は〜{getNewBonusConditionsEndDateLong()}までの期間限定です。
+              </p>
+            </div>
+            <div className="bg-[#f7f3ee] rounded-xl overflow-hidden border border-[#ece6dc]">
+              <table className="w-full border-collapse text-sm">
+                <caption className="sr-only">初めてのご利用特典の本数ごとの金額</caption>
+                <thead>
+                  <tr className="bg-[#26221e] text-white text-[13px]">
+                    <th scope="col" className="py-3 px-5 text-left font-bold">
+                      本数
+                    </th>
+                    <th scope="col" className="py-3 px-5 text-right font-bold">
+                      特典額
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bonusRows.map((row) => (
+                    <tr
+                      key={row.count}
+                      className="border-t border-[#ece6dc] even:bg-white"
+                    >
+                      <th
+                        scope="row"
+                        className="py-3 px-5 text-left font-bold text-[#26221e] whitespace-nowrap"
+                      >
+                        {row.count}
+                      </th>
+                      <td className="py-3 px-5 text-right font-extrabold text-[#b3242b] whitespace-nowrap">
+                        {row.bonus}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-[#726b5e] leading-relaxed">
+              ※発送用の段ボールをご自身でご用意いただく場合は、別途{boxBonus.amount}の特典があります（ディスクのみ・レンタル品等を除く{getBoxBonusMinCount()}点以上が対象、〜{getNewBonusConditionsEndDateLong()}まで）。
+            </p>
+          </div>
+
           <TrackedLink
             href="/application"
             cta_location="campaign_mid"
@@ -96,6 +159,7 @@ export default function CampaignPage() {
           >
             この内容で無料査定を申し込む
           </TrackedLink>
+          <ReassurancePoints />
 
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#726b5e] leading-relaxed">

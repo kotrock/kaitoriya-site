@@ -4,7 +4,8 @@
 // リクエストで受け取ったファイルはメモリ上でBase64化してメール送信APIに渡すだけで、
 // この関数の処理が終わると同時に（明示的な削除処理なしに）メモリから解放されます。
 
-import { company } from "@/data/site";
+import { company, boxBonus } from "@/data/site";
+import { getBoxBonusMinCount } from "@/lib/campaign";
 import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
@@ -252,11 +253,11 @@ export async function POST(request) {
       ? "【高買屋】仮査定のお申し込みを受け付けました"
       : "【高買屋】スピード査定のお申し込みを受け付けました";
 
-  // 無料段ボールをご自身で用意いただいた場合の+300円ボーナスは、
+  // 無料段ボールをご自身で用意いただいた場合のボーナスは、
   // 既存の box_option（ApplicationForm.js）・FAQと同じ内容で案内する。
   const boxBonusCallout = [
     "-------------------------------------------",
-    "段ボールをご自身でご用意いただくと、査定額に+300円プラス！",
+    `段ボールをご自身でご用意いただくと、査定額に+${boxBonus.amount}プラス！（ディスクのみ・レンタル品等を除く${getBoxBonusMinCount()}点以上の場合）`,
     "-------------------------------------------",
   ].join("\n");
 

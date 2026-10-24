@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
-import { payoutOptions } from "@/data/site";
+import { payoutOptions, boxBonus } from "@/data/site";
+import { getBoxBonusMinCount } from "@/lib/campaign";
 import { trackEvent } from "@/lib/analytics";
 import Turnstile from "@/components/Turnstile";
+import ReassurancePoints from "@/components/ReassurancePoints";
 import {
   compressImageToTarget,
   compressImagesToBudget,
@@ -79,6 +81,7 @@ function setInputFiles(input, files) {
 }
 
 export default function ApplicationForm() {
+  const boxBonusMinCount = getBoxBonusMinCount();
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
   const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
   const [images, setImages] = useState([]);
@@ -325,6 +328,7 @@ export default function ApplicationForm() {
       ref={cardRef}
       className="max-w-[700px] mx-auto bg-white border border-[#ece6dc] rounded-2xl p-8 flex flex-col gap-8"
     >
+      <ReassurancePoints />
       <StepIndicator steps={STEPS} current={step} />
 
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-8">
@@ -574,7 +578,7 @@ export default function ApplicationForm() {
               発送用の段ボール
             </h3>
             <p className="text-xs text-[#726b5e] leading-relaxed">
-              高買屋では5箱まで無料で発送用の段ボールをお送りいたします。ご自身でご用意いただくと査定額に＋300円上乗せいたします（ディスクのみ・レンタル品等を除く10点以上の場合。セット商品は点数に関わらず1点としてカウントします）。
+              高買屋では5箱まで無料で発送用の段ボールをお送りいたします。ご自身でご用意いただくと査定額に＋{boxBonus.amount}上乗せいたします（ディスクのみ・レンタル品等を除く{boxBonusMinCount}点以上の場合。セット商品は点数に関わらず1点としてカウントします）。
             </p>
             <select name="box_option" className={inputCls} defaultValue="">
               <option value="" disabled>
@@ -583,8 +587,8 @@ export default function ApplicationForm() {
               <option value="段ボールが必要（無料）">
                 段ボールが必要（無料）
               </option>
-              <option value="自分で用意する（+300円・ディスクのみ・レンタル品等を除く10点以上の場合）">
-                自分で用意する（+300円・ディスクのみ・レンタル品等を除く10点以上の場合）
+              <option value={`自分で用意する（+${boxBonus.amount}・ディスクのみ・レンタル品等を除く${boxBonusMinCount}点以上の場合）`}>
+                {`自分で用意する（+${boxBonus.amount}・ディスクのみ・レンタル品等を除く${boxBonusMinCount}点以上の場合）`}
               </option>
             </select>
           </div>

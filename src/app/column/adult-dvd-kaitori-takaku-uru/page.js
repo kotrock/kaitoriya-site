@@ -2,8 +2,16 @@ import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import TrackedLink from "@/components/TrackedLink";
 import { CheckCircleIcon } from "@/components/Icons";
-import { siteUrl, company, payoutOptions, campaign, ogImage } from "@/data/site";
-import { isCampaignActive } from "@/lib/campaign";
+import {
+  siteUrl,
+  company,
+  payoutOptions,
+  campaign,
+  firstTimeBonusTiers,
+  boxBonus,
+  ogImage,
+} from "@/data/site";
+import { isCampaignActive, getBoxBonusMinCount } from "@/lib/campaign";
 
 const PAGE_PATH = "/column/adult-dvd-kaitori-takaku-uru";
 const PAGE_URL = `${siteUrl}${PAGE_PATH}`;
@@ -120,7 +128,8 @@ function CampaignNotice({ active }) {
   if (!active) {
     return (
       <p className="text-sm text-[#5c554d] bg-[#f7f3ee] rounded-xl px-5 py-4">
-        初めての方は買取額+{campaign.normalBonus}（10点以上）。ディスクのみ・レンタル品等を除く。セット商品は1点として数えます。
+        初めての方は買取額+{campaign.normalBonus}（{firstTimeBonusTiers.tier2.minCount}本以上。
+        {firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本でも+{firstTimeBonusTiers.tier1.bonus}）。ディスクのみ・レンタル品等を除く。セット商品は1点として数えます。
       </p>
     );
   }
@@ -135,7 +144,7 @@ function CampaignNotice({ active }) {
         <span className="text-[#ffe08a]">
           期間限定+{campaign.campaignBonus}
         </span>
-        （10点以上）
+        （{firstTimeBonusTiers.tier2.minCount}本以上。{firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本でも+{firstTimeBonusTiers.tier1.bonus}）
       </p>
       <p className="text-xs text-white/80">
         〜{formatJapaneseDate(campaign.endDate)}まで
@@ -496,14 +505,14 @@ export default function AdultDvdKaitoriTakakuUruPage() {
                 査定無料・送料無料・振込手数料{payoutOptions.bankFee}
               </li>
               <li>
-                初めての方は買取額アップ（10点以上、キャンペーン期間中は期間限定の増額）。ディスクのみ・レンタル品等を除く。セット商品は1点として数える
+                初めての方は買取額アップ（{firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本で+{firstTimeBonusTiers.tier1.bonus}、{firstTimeBonusTiers.tier2.minCount}本以上で+{campaign.normalBonus}、キャンペーン期間中は期間限定の増額）。ディスクのみ・レンタル品等を除く。セット商品は1点として数える
               </li>
               <li>
                 事前に金額が分かる「仮査定」（全商品の背表紙が見える写真が必要。写真がない商品は最低価格での査定）
               </li>
               <li>急ぎの方向けの「スピードコース」（5点以上）</li>
               <li>
-                段ボールを自分で用意すると特典（ディスクのみ・レンタル品等を除く10点以上）
+                段ボールを自分で用意すると特典（ディスクのみ・レンタル品等を除く{getBoxBonusMinCount()}点以上）
               </li>
               <li>
                 運営会社と古物商許可番号は

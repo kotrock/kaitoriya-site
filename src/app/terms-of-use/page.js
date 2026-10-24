@@ -1,4 +1,6 @@
 import PageHero from "@/components/PageHero";
+import { campaign, firstTimeBonusTiers, boxBonus } from "@/data/site";
+import { getNewBonusConditionsEndDateLong } from "@/lib/campaign";
 
 export const metadata = {
   title: "利用規約 | アダルトDVD高価買取の高買屋",
@@ -29,6 +31,10 @@ const sections = [
   {
     title: "第5条（代金の支払い）",
     body: "利用者は、本サービスが提示した買取金額に承諾した後、指定の代金受取方法を選択するものとします。代金の支払いは銀行振込またはPayPay受け取りからお選びいただけます。銀行振込の場合は振込手数料を利用者様にご負担いただき、PayPay受け取りの場合は所定額を上乗せしてお支払いします。口座情報に不備があった場合はご連絡いたします。当社の責によらない理由により代金をお受け取りいただけなかった場合、当社は責任を負いません。",
+  },
+  {
+    title: "第5条の2（買取特典・査定条件）",
+    body: `初めてご利用いただく方（お一人様1回限り）を対象に、${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せする特典を設けています。発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります。これら${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。特典・キャンペーンは予告なく内容を変更・終了する場合があります。`,
   },
   {
     title: "第6条（買取のキャンセル・返送等）",

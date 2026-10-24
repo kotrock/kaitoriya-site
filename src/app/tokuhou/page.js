@@ -1,5 +1,13 @@
 import PageHero from "@/components/PageHero";
-import { company, payoutOptions, ogImage } from "@/data/site";
+import {
+  company,
+  payoutOptions,
+  campaign,
+  firstTimeBonusTiers,
+  boxBonus,
+  ogImage,
+} from "@/data/site";
+import { getNewBonusConditionsEndDateLong } from "@/lib/campaign";
 
 const title = "特定商取引法 | アダルトDVD高価買取の高買屋";
 const description =
@@ -34,6 +42,10 @@ const rows = [
   [
     "お支払い",
     `銀行振込　${company.bank}（振込手数料${payoutOptions.bankFee}）／PayPay受け取り（${payoutOptions.paypayBonus}プラスでお支払い）`,
+  ],
+  [
+    "買取特典・査定条件",
+    `初めてご利用の方（お一人様1回限り）が対象です。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せします。発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります（上記${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。`,
   ],
   [
     "キャンセルについて",

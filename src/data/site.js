@@ -41,11 +41,8 @@ export const payoutOptions = {
   paypayBonus: "300円",
 };
 
-// 初回利用キャンペーンのボーナス額（通常時）。
-export const firstTimeBonus = "1,000円";
-
 // 期間限定キャンペーン設定。activeがtrueの間、startDate〜endDate（日本時間、
-// 各日の0:00〜23:59:59）の期間内だけ、通常のfirstTimeBonusの代わりにcampaignBonusを
+// 各日の0:00〜23:59:59）の期間内だけ、通常のnormalBonusの代わりにcampaignBonusを
 // 表示する。期間判定はsrc/lib/campaign.jsのisCampaignActive()で行う。
 export const campaign = {
   active: true,
@@ -53,6 +50,31 @@ export const campaign = {
   campaignBonus: "1,500円",
   startDate: "2026-10-05",
   endDate: "2026-11-02",
+};
+
+// 初回ご利用特典の本数区分。tier1は新条件（newBonusConditions参照）の適用期間中のみ
+// 対象となる本数帯で、期間外は従来どおりtier2（10本以上）のみが特典対象となる。
+// tier2の金額は通常時campaign.normalBonus、キャンペーン中（campaign参照）はcampaignBonus。
+export const firstTimeBonusTiers = {
+  tier1: { minCount: 5, maxCount: 9, bonus: "500円" },
+  tier2: { minCount: 10 },
+};
+
+// 2026-10-24〜2026-12-31の期間限定で、初回ご利用特典の対象を5本から拡大し（tier1追加）、
+// 段ボール自前用意特典の対象本数も10本以上→5本以上に引き下げる。終了日はここ1か所を
+// 変更すれば、参照しているすべてのページ・メール文言に反映される。
+// 判定はsrc/lib/campaign.jsのisNewBonusConditionsActive()で行う。
+export const newBonusConditions = {
+  startDate: "2026-10-24",
+  endDate: "2026-12-31",
+};
+
+// 段ボール自前用意特典。newBonusConditions適用期間中はnewMinCount（5本以上）、
+// 期間外はoldMinCount（10本以上）が対象本数となる。
+export const boxBonus = {
+  amount: "300円",
+  newMinCount: 5,
+  oldMinCount: 10,
 };
 
 export const nav = [
@@ -270,7 +292,7 @@ export const faqs = [
   },
   {
     q: "DVDを送る段ボールがありません。",
-    a: "お申し込みの際に段ボールの有無をご記入ください。高買屋では「5箱まで無料」で発送用の段ボールをお送りいたします。お客様が段ボールをご用意して頂くと査定額にプラス300円上乗せいたします（ディスクのみ・レンタル品等を除く10点以上の場合、どんな段ボールでもOK。セット商品は点数に関わらず1点としてカウントします）。",
+    a: `お申し込みの際に段ボールの有無をご記入ください。高買屋では「5箱まで無料」で発送用の段ボールをお送りいたします。お客様が段ボールをご用意して頂くと査定額にプラス${boxBonus.amount}上乗せいたします（ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上の場合、どんな段ボールでもOK。セット商品は点数に関わらず1点としてカウントします。2026年12月31日までの期間限定で、通常は${boxBonus.oldMinCount}点以上が対象です）。`,
   },
   {
     q: "どんな商品が高く売れますか。",
@@ -285,8 +307,12 @@ export const faqs = [
     a: "銀行振込とPayPay受け取りからお選びいただけます。振込手数料はどちらも無料です。さらにPayPay受け取りをお選びの場合は、査定額に300円プラスしてお支払いします。",
   },
   {
-    q: "「初めての方は査定額+1,000円」とはどういうキャンペーンですか？",
-    a: "当社を初めてご利用いただく方が、10点（本）以上をまとめてご発送いただいた場合、査定額に1,000円を上乗せするキャンペーンです。ディスクのみ・レンタル落ち品は対象外です。セット商品（2枚組・3枚組等）は点数に関わらず1点としてカウントします。詳しい条件はキャンペーンページをご確認ください。",
+    q: "初めてのご利用特典とは、どのようなキャンペーンですか？",
+    a: `当社を初めてご利用いただく方（お一人様1回限り）が対象です。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で${campaign.normalBonus}（キャンペーン期間中は${campaign.campaignBonus}）を上乗せいたします。ディスクのみ・レンタル落ち品は対象外です。セット商品（2枚組・3枚組等）は点数に関わらず1点としてカウントします。詳しい条件はキャンペーンページをご確認ください。`,
+  },
+  {
+    q: "少ない本数でも特典はありますか？",
+    a: `はい。2026年12月31日までの期間限定で、初めてご利用の方は${firstTimeBonusTiers.tier1.minCount}本から特典の対象になりました。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）です。ディスクのみ・レンタル落ち品は対象外、セット商品は点数に関わらず1点としてカウントします。`,
   },
   {
     q: "セット商品は何点として数えますか？",
