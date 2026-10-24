@@ -86,6 +86,7 @@ export default function ApplicationForm() {
   const [paymentMethod, setPaymentMethod] = useState(""); // "" | "bank" | "paypay"
   const [images, setImages] = useState([]);
   const [imagesError, setImagesError] = useState("");
+  const [quantityError, setQuantityError] = useState("");
   const [compressing, setCompressing] = useState(false);
   const [selfiePhoto, setSelfiePhoto] = useState(null);
   const [idPhoto, setIdPhoto] = useState(null);
@@ -204,10 +205,39 @@ export default function ApplicationForm() {
     }
   }
 
+  // 仮査定申請の最低本数（アダルトDVD・ブルーレイ・イメージDVD/BD合計5本以上、
+  // またはそれらが0冊でコミックのみ10冊以上）を満たしているか確認する。
+  // 満たさない場合はやさしい文言のエラーメッセージを返す（満たす場合はnull）。
+  function checkMinimumQuantity() {
+    const data = new FormData(formRef.current);
+    const mainCount =
+      (Number(data.get("dvd_count")) || 0) +
+      (Number(data.get("bd_count")) || 0) +
+      (Number(data.get("other_count")) || 0);
+    const comicCountNum = Number(data.get("comic_count")) || 0;
+    const meetsMinimum = mainCount >= 5 || (mainCount === 0 && comicCountNum >= 10);
+    if (meetsMinimum) return null;
+    const displayCount = mainCount > 0 ? mainCount : comicCountNum;
+    const unit = mainCount > 0 ? "本" : "冊";
+    return `買取は、アダルトDVD・ブルーレイ合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`;
+  }
+
   function goNext() {
     if (compressing) return;
     const currentEl = stepRefs[step]?.current;
     if (!validateStep(currentEl)) return;
+    if (step === 1 && course === "provisional") {
+      const message = checkMinimumQuantity();
+      if (message) {
+        setQuantityError(message);
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: "validation",
+        });
+        return;
+      }
+      setQuantityError("");
+    }
     if (step === 2) {
       const data = new FormData(formRef.current);
       const entries = Object.fromEntries(data.entries());
@@ -239,6 +269,20 @@ export default function ApplicationForm() {
 
     // 画像処理中は送信しない（ボタン自体も無効化しているが念のための二重ガード）。
     if (compressing) return;
+
+    // 仮査定申請の最低本数（goNextでのチェックをすり抜けた場合の保険）。
+    if (course === "provisional") {
+      const message = checkMinimumQuantity();
+      if (message) {
+        setStep(1);
+        setQuantityError(message);
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: "validation",
+        });
+        return;
+      }
+    }
 
     setStatus("sending");
     setErrorMessage("");
@@ -404,9 +448,10 @@ export default function ApplicationForm() {
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-semibold text-[#26221e]">
                 買取点数の内訳
+                <span className="text-[#b3242b]"> （必須）</span>
               </span>
               <span className="text-xs text-[#726b5e]">
-                アダルトDVD・ブルーレイは5本以上、コミックのみの場合は10冊以上から買取可能です。わかる範囲でご記入ください（空欄可）。
+                アダルトDVD・ブルーレイ・イメージDVD/BD（「その他」にご記入ください）は合計5本以上、コミックのみの場合は10冊以上からお申し込みいただけます。わかる範囲で内訳をご記入ください。
               </span>
               <div className="grid grid-cols-2 gap-3">
                 <label className="flex flex-col gap-1">
@@ -417,6 +462,7 @@ export default function ApplicationForm() {
                     type="number"
                     name="dvd_count"
                     min={0}
+                    onChange={() => setQuantityError("")}
                     className={inputCls}
                   />
                 </label>
@@ -428,6 +474,7 @@ export default function ApplicationForm() {
                     type="number"
                     name="bd_count"
                     min={0}
+                    onChange={() => setQuantityError("")}
                     className={inputCls}
                   />
                 </label>
@@ -439,21 +486,29 @@ export default function ApplicationForm() {
                     type="number"
                     name="comic_count"
                     min={0}
+                    onChange={() => setQuantityError("")}
                     className={inputCls}
                   />
                 </label>
                 <label className="flex flex-col gap-1">
                   <span className="text-xs font-semibold text-[#5c554d]">
-                    その他（点数）
+                    その他（イメージDVD/BD等。点数）
                   </span>
                   <input
                     type="number"
                     name="other_count"
                     min={0}
+                    onChange={() => setQuantityError("")}
                     className={inputCls}
                   />
                 </label>
               </div>
+              {quantityError && (
+                <p className="text-xs text-[#b3242b]">{quantityError}</p>
+              )}
+              <span className="text-xs text-[#726b5e]">
+                本人確認書類は申込み時には不要です。仮査定にご納得いただいた後、「発送確定フォーム」で身分証明書の写真のみご提出いただきます（顔写真は不要です）。
+              </span>
             </div>
           ) : (
             <Field

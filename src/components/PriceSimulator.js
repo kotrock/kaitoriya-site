@@ -91,6 +91,11 @@ export default function PriceSimulator() {
             下記の区分ごとに本数を入力すると、概算金額が表示されます。
           </div>
         )}
+        {totalQty > 0 && totalQty < 5 && (
+          <div className="text-xs font-bold text-[#b3242b]">
+            買取は5本以上からです（現在{totalQty}本）
+          </div>
+        )}
         <div className="text-[11px] text-[#726b5e]">
           1本あたり定価{yen.format(AVG_PRICE_LOW)}〜{yen.format(AVG_PRICE_HIGH)}円・区分ごとの買取率の目安で試算
         </div>

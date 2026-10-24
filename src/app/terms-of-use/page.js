@@ -1,5 +1,11 @@
 import PageHero from "@/components/PageHero";
-import { campaign, firstTimeBonusTiers, boxBonus, minimumGuarantee } from "@/data/site";
+import {
+  campaign,
+  firstTimeBonusTiers,
+  boxBonus,
+  minimumGuarantee,
+  bonusStackingNote,
+} from "@/data/site";
 import { getNewBonusConditionsEndDateLong } from "@/lib/campaign";
 
 export const metadata = {
@@ -34,11 +40,11 @@ const sections = [
   },
   {
     title: "第5条の2（買取特典・査定条件）",
-    body: `初めてご利用いただく方（お一人様1回限り）を対象に、${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せする特典を設けています。発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります。これら${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です。また、買取対象商品${minimumGuarantee.minCount}本以上の場合、特典を含めた買取金額が最低${minimumGuarantee.amount}になるよう保証します（査定額と特典の合計が${minimumGuarantee.amount}に満たない場合のみ${minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません。査定できない商品（コピー品・状態不良等）は本数に含みません。買取対象商品が${minimumGuarantee.minCount}本未満になった場合は対象外です。こちらも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。特典・キャンペーンは予告なく内容を変更・終了する場合があります。`,
+    body: `初めてご利用いただく方（お一人様1回限り）を対象に、${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せする特典を設けています。${bonusStackingNote}発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります。これら${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です。また、買取対象商品${minimumGuarantee.minCount}本以上の場合、特典を含めた買取金額が最低${minimumGuarantee.amount}になるよう保証します（査定額と、適用される特典の合計が${minimumGuarantee.amount}に満たない場合のみ${minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません。査定できない商品（コピー品・状態不良等）は本数に含みません。買取対象商品が${minimumGuarantee.minCount}本未満になった場合は対象外です。こちらも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。特典・キャンペーンは予告なく内容を変更・終了する場合があります。`,
   },
   {
     title: "第6条（買取のキャンセル・返送等）",
-    body: "査定結果にご満足いただけない場合、キャンセル・返送をご依頼いただけます（返送料は着払い）。ただし複数の物品を一括でお送りいただいた場合、一部のみの返却はお受けできません。査定結果を確認せずにお任せいただく買取（お任せ買取）の場合、発送後の返送はご依頼いただけません。査定結果にご承諾いただいた時点で売買契約が成立し、以降の返送請求はお受けできません。お預かり中の破損・紛失については、当社に故意または重過失がある場合に限り、販売金額を上限として賠償いたします。返却後にお受け取りがなく再返送となる場合、その費用は利用者様のご負担となります。返送から1ヶ月経過してもお受け取りがない場合、所有権を放棄されたものとみなし処分することに同意いただきます。",
+    body: "査定結果にご満足いただけない場合、キャンセル・返送をご依頼いただけます（返送料は着払い）。ただし複数の物品を一括でお送りいただいた場合、一部のみの返却はお受けできません。査定結果を確認せずにお申し込みいただくスピード買取の場合、発送後の返送はご依頼いただけません。査定結果にご承諾いただいた時点で売買契約が成立し、以降の返送請求はお受けできません。お預かり中の破損・紛失については、当社に故意または重過失がある場合に限り、販売金額を上限として賠償いたします。返却後にお受け取りがなく再返送となる場合、その費用は利用者様のご負担となります。返送から1ヶ月経過してもお受け取りがない場合、所有権を放棄されたものとみなし処分することに同意いただきます。",
   },
   {
     title: "第7条（個人情報の取扱い）",

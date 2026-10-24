@@ -97,6 +97,39 @@ export async function POST(request) {
   const paymentMethod = String(formData.get("payment_method") || "");
   const productDetails = String(formData.get("product_details") || "");
 
+  // 仮査定申請の最低本数（アダルトDVD・ブルーレイ・イメージDVD/BD合計5本以上、
+  // またはそれらが0冊でコミックのみ10冊以上）。クライアント側のチェックを
+  // すり抜けた場合の保険として、サーバー側でも同じ条件で検証する。
+  if (course === "provisional") {
+    const mainCount =
+      (Number(dvdCount) || 0) + (Number(bdCount) || 0) + (Number(otherCount) || 0);
+    const comicCountNum = Number(comicCount) || 0;
+    const meetsMinimum = mainCount >= 5 || (mainCount === 0 && comicCountNum >= 10);
+    if (!meetsMinimum) {
+      const displayCount = mainCount > 0 ? mainCount : comicCountNum;
+      const unit = mainCount > 0 ? "本" : "冊";
+      return Response.json(
+        {
+          success: false,
+          error: `買取は、アダルトDVD・ブルーレイ合わせて5本以上（コミックのみの場合は10冊以上）からです。現在${displayCount}${unit}です。`,
+        },
+        { status: 400 }
+      );
+    }
+  }
+
+  // スピード買取の最低本数（5本以上）。クライアント側の min={5}・required を
+  // すり抜けた場合の保険として、サーバー側でも同じ条件で検証する。
+  if (course === "speed" && (Number(quantity) || 0) < 5) {
+    return Response.json(
+      {
+        success: false,
+        error: `買取は5本以上からです。現在${Number(quantity) || 0}本です。`,
+      },
+      { status: 400 }
+    );
+  }
+
   const productImages = formData
     .getAll("images")
     .filter((entry) => entry instanceof File && entry.size > 0);

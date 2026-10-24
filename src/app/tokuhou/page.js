@@ -6,6 +6,7 @@ import {
   firstTimeBonusTiers,
   boxBonus,
   minimumGuarantee,
+  bonusStackingNote,
   ogImage,
 } from "@/data/site";
 import { getNewBonusConditionsEndDateLong } from "@/lib/campaign";
@@ -46,7 +47,7 @@ const rows = [
   ],
   [
     "買取特典・査定条件",
-    `初めてご利用の方（お一人様1回限り）が対象です。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せします。発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります（上記${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。また、買取対象商品${minimumGuarantee.minCount}本以上の場合、特典を含めた買取金額が最低${minimumGuarantee.amount}になるよう保証します（査定額と特典の合計が${minimumGuarantee.amount}に満たない場合のみ${minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません。査定できない商品（コピー品・状態不良等）は本数に含みません。買取対象商品が${minimumGuarantee.minCount}本未満になった場合は対象外です。こちらも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。`,
+    `初めてご利用の方（お一人様1回限り）が対象です。${firstTimeBonusTiers.tier1.minCount}〜${firstTimeBonusTiers.tier1.maxCount}本で査定額に+${firstTimeBonusTiers.tier1.bonus}、${firstTimeBonusTiers.tier2.minCount}本以上で+${campaign.normalBonus}（キャンペーン期間中は+${campaign.campaignBonus}）を上乗せします。${bonusStackingNote}発送用の段ボールをご自身でご用意いただく場合は、ディスクのみ・レンタル品等を除く${boxBonus.newMinCount}点以上で+${boxBonus.amount}の特典があります（上記${firstTimeBonusTiers.tier1.minCount}本からの特典拡大・段ボール特典の${boxBonus.newMinCount}点以上条件は、いずれも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。また、買取対象商品${minimumGuarantee.minCount}本以上の場合、特典を含めた買取金額が最低${minimumGuarantee.amount}になるよう保証します（査定額と、適用される特典の合計が${minimumGuarantee.amount}に満たない場合のみ${minimumGuarantee.amount}まで引き上げる保証で、特典に加えてさらに上乗せするものではありません。査定できない商品（コピー品・状態不良等）は本数に含みません。買取対象商品が${minimumGuarantee.minCount}本未満になった場合は対象外です。こちらも〜${getNewBonusConditionsEndDateLong()}までの期間限定です）。同じ商品を複数お売りいただく場合、2本目以降は半額で査定します。DVDとブルーレイは別の商品として数え、同じタイトルの限定版と通常版は同じ商品として数えます。`,
   ],
   [
     "キャンセルについて",

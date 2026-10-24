@@ -16,6 +16,7 @@ import {
   firstTimeBonusTiers,
   boxBonus,
   minimumGuarantee,
+  bonusStackingNote,
   storeVisit,
 } from "@/data/site";
 import {
@@ -195,7 +196,7 @@ export default function Home() {
               〜{getNewBonusConditionsEndDateLong()}まで
             </span>
             <span className="block mt-1 text-[11px] text-[#9a9386]">
-              {minimumGuarantee.minCount}本以上なら特典込みの買取金額を最低{minimumGuarantee.amount}保証（条件あり）
+              {minimumGuarantee.minCount}本以上なら特典込みの買取金額を最低{minimumGuarantee.amount}保証（条件あり）・お一人様1回
             </span>
           </p>
         </div>
@@ -349,6 +350,9 @@ export default function Home() {
           <BonusTiers aRank={bonusTiers.aRank} bRank={bonusTiers.bRank} />
           <p className="text-xs text-[#726b5e] text-center">
             ※2枚組・3枚組などのセット商品は、点数に関わらず1点としてカウントします。
+          </p>
+          <p className="text-xs text-[#726b5e] text-center">
+            ※{bonusStackingNote}
           </p>
         </div>
       </section>

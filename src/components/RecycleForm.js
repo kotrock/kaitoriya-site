@@ -3,8 +3,6 @@
 import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
-import { boxBonus } from "@/data/site";
-import { getBoxBonusMinCount } from "@/lib/campaign";
 
 const STEPS = ["お客様情報", "詳細", "確認"];
 
@@ -15,7 +13,6 @@ const boxSizes = [
 ];
 
 export default function RecycleForm() {
-  const boxBonusMinCount = getBoxBonusMinCount();
   const [wantsKit, setWantsKit] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [step, setStep] = useState(0);
@@ -158,9 +155,6 @@ export default function RecycleForm() {
                 希望する
               </label>
             </div>
-            <p className="text-xs text-[#726b5e] leading-relaxed">
-              ご自身で段ボールをご用意して頂くと査定金額に＋{boxBonus.amount}アップさせていただきます。（買取対象商品が{boxBonusMinCount}点以上の方のみが対象となります）
-            </p>
 
             {wantsKit === "yes" && (
               <div className="flex flex-col gap-4 mt-1 p-5 bg-[#f7f3ee] rounded-xl">
