@@ -122,11 +122,12 @@ export default function PriceSimulator() {
                 <label className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     min={0}
                     placeholder="0"
                     value={v.qty ?? ""}
                     onChange={(e) => setField(tier.condition, "qty", e.target.value)}
-                    className="w-20 border border-[#d8d2c8] rounded-lg py-2 px-3 text-sm text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
+                    className="w-20 border border-[#d8d2c8] rounded-lg py-2 px-3 text-base text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
                   />
                   <span className="text-xs text-[#726b5e]">本</span>
                 </label>
@@ -146,11 +147,12 @@ export default function PriceSimulator() {
                       </span>
                       <input
                         type="number"
+                        inputMode="numeric"
                         min={0}
                         placeholder="0"
                         value={v.dup ?? ""}
                         onChange={(e) => setField(tier.condition, "dup", e.target.value)}
-                        className="w-14 border border-[#e5dfd4] rounded-lg py-1 px-2 text-xs text-right text-[#5c554d] focus:outline-none focus:border-[#b3242b]"
+                        className="w-16 border border-[#e5dfd4] rounded-lg py-1.5 px-2 text-base text-right text-[#5c554d] focus:outline-none focus:border-[#b3242b]"
                       />
                       <span className="text-[11px] text-[#9a9386]">本</span>
                     </label>
@@ -188,22 +190,24 @@ export default function PriceSimulator() {
                     <span className="text-xs text-[#726b5e]">定価</span>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min={0}
                       placeholder="0"
                       value={v.price ?? ""}
                       onChange={(e) => setField(tier.condition, "price", e.target.value)}
-                      className="w-24 border border-[#d8d2c8] rounded-lg py-2 px-3 text-sm text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
+                      className="w-28 border border-[#d8d2c8] rounded-lg py-2 px-3 text-base text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
                     />
                     <span className="text-xs text-[#726b5e]">円</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
                       type="number"
+                      inputMode="numeric"
                       min={0}
                       placeholder="0"
                       value={v.qty ?? ""}
                       onChange={(e) => setField(tier.condition, "qty", e.target.value)}
-                      className="w-16 border border-[#d8d2c8] rounded-lg py-2 px-3 text-sm text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
+                      className="w-20 border border-[#d8d2c8] rounded-lg py-2 px-3 text-base text-right text-[#26221e] focus:outline-none focus:border-[#b3242b]"
                     />
                     <span className="text-xs text-[#726b5e]">本</span>
                   </label>
@@ -224,11 +228,12 @@ export default function PriceSimulator() {
                       </span>
                       <input
                         type="number"
+                        inputMode="numeric"
                         min={0}
                         placeholder="0"
                         value={v.dup ?? ""}
                         onChange={(e) => setField(tier.condition, "dup", e.target.value)}
-                        className="w-14 border border-[#e5dfd4] rounded-lg py-1 px-2 text-xs text-right text-[#5c554d] focus:outline-none focus:border-[#b3242b]"
+                        className="w-16 border border-[#e5dfd4] rounded-lg py-1.5 px-2 text-base text-right text-[#5c554d] focus:outline-none focus:border-[#b3242b]"
                       />
                       <span className="text-[11px] text-[#9a9386]">本</span>
                     </label>

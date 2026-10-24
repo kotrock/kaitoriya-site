@@ -183,22 +183,28 @@ export default function Home() {
 
       {/* FIRST TIME CAMPAIGN */}
       <section className="w-full px-6 md:px-8 py-10">
-        <div className="max-w-[1000px] mx-auto mb-3 flex justify-center md:justify-start">
-          <p className="text-xs sm:text-sm text-[#5c554d] bg-[#f7f3ee] border border-[#ece6dc] rounded-full px-4 py-2 text-center leading-relaxed">
-            <span className="font-bold text-[#b3242b]">
+        <div className="max-w-[1000px] mx-auto mb-3">
+          <div className="bg-[#f7f3ee] border border-[#ece6dc] rounded-2xl px-5 py-4 flex flex-col gap-1.5 text-center md:text-left">
+            <p className="text-sm sm:text-base font-bold text-[#b3242b] break-keep">
               {firstTimeBonusTiers.tier1.minCount}本からでも特典の対象になりました
-            </span>
-            ：{firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本
-            +{firstTimeBonusTiers.tier1.bonus}／{firstTimeBonusTiers.tier2.minCount}本以上
-            +{getCurrentBonus()}
-            {campaignActive && "（期間限定）"}／段ボール持参+{boxBonus.amount}
-            <span className="block sm:inline sm:ml-1 text-[11px] text-[#9a9386]">
+            </p>
+            <p className="text-xs sm:text-sm text-[#5c554d] leading-relaxed break-keep">
+              {firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本 +{firstTimeBonusTiers.tier1.bonus}
+              {" / "}
+              {firstTimeBonusTiers.tier2.minCount}本以上 +{getCurrentBonus()}
+              {campaignActive && "（期間限定）"}
+              {" / "}
+              段ボール持参 +{boxBonus.amount}
+            </p>
+            <p className="text-[11px] text-[#9a9386]">
               〜{getNewBonusConditionsEndDateLong()}まで
-            </span>
-            <span className="block mt-1 text-[11px] text-[#9a9386]">
-              {minimumGuarantee.minCount}本以上なら特典込みの買取金額を最低{minimumGuarantee.amount}保証（条件あり）・お一人様1回
-            </span>
-          </p>
+            </p>
+            <p className="text-[11px] text-[#9a9386] leading-relaxed break-keep">
+              {minimumGuarantee.minCount}本以上なら特典込みの買取金額を最低{minimumGuarantee.amount}保証（条件あり）
+              <br className="sm:hidden" />
+              ※お一人様1回
+            </p>
+          </div>
         </div>
         <div className="max-w-[1000px] mx-auto bg-gradient-to-b from-[#b3242b] to-[#8f1c22] rounded-2xl p-6 flex flex-wrap items-center justify-center md:justify-between gap-4">
           <p className="text-white font-extrabold leading-snug break-keep text-center md:text-left">
@@ -224,6 +230,9 @@ export default function Home() {
             <span className="block text-xs sm:text-sm font-semibold mt-1 text-white/80">
               （{firstTimeBonusTiers.tier2.minCount}本以上）
               {campaignActive && `　〜${getCampaignEndDateShort()}まで`}
+            </span>
+            <span className="block text-xs text-white/80 mt-1">
+              {firstTimeBonusTiers.tier1.minCount}本からでもOK：{firstTimeBonusTiers.tier1.minCount}〜{firstTimeBonusTiers.tier1.maxCount}本 +{firstTimeBonusTiers.tier1.bonus}
             </span>
             <Link
               href="/campaign"

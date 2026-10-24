@@ -477,6 +477,7 @@ export default function ApplicationForm() {
                     <span className="flex items-center gap-2">
                       <input
                         type="number"
+                        inputMode="numeric"
                         name={field.name}
                         min={0}
                         onChange={() => setQuantityError("")}
@@ -501,6 +502,7 @@ export default function ApplicationForm() {
             >
               <input
                 type="number"
+                inputMode="numeric"
                 name="quantity"
                 min={5}
                 required
@@ -852,8 +854,10 @@ export default function ApplicationForm() {
   );
 }
 
+// text-baseを使用（16px未満だとiOS Safariでフォーカス時に自動ズームが発生し、
+// 入力中に画面が左右に動く原因になるため）。
 const inputCls =
-  "w-full border border-[#d8d2c8] rounded-lg py-2.5 px-3.5 text-sm text-[#26221e] focus:outline-none focus:border-[#b3242b]";
+  "w-full border border-[#d8d2c8] rounded-lg py-2.5 px-3.5 text-base text-[#26221e] focus:outline-none focus:border-[#b3242b]";
 
 function Field({ label, required, hint, children }) {
   return (
