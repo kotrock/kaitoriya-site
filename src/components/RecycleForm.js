@@ -1,8 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
+import Turnstile from "@/components/Turnstile";
+
+// スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
+// 短すぎる場合はbotによる自動送信とみなす。
+const MIN_ELAPSED_MS = 3000;
 
 const STEPS = ["お客様情報", "詳細", "確認"];
 
@@ -12,15 +17,32 @@ const boxSizes = [
   { id: "C", label: "Ｃ：DVDケース85枚程度（幅37cm 奥行45cm 高さ25cm）" },
 ];
 
+const PREFECTURES = [
+  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+  "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+  "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+  "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+  "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
+];
+
 export default function RecycleForm() {
   const [wantsKit, setWantsKit] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [errorMessage, setErrorMessage] = useState("");
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
+  const [formLoadedAt, setFormLoadedAt] = useState(null);
   const cardRef = useRef(null);
   const formRef = useRef(null);
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormLoadedAt(Date.now());
+  }, []);
 
   function validateStep(el) {
     if (!el) return true;
@@ -52,24 +74,35 @@ export default function RecycleForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
+    const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
+    if (elapsed < MIN_ELAPSED_MS) {
+      setStatus("error");
+      setErrorMessage("");
+      return;
+    }
+
     setStatus("sending");
+    setErrorMessage("");
 
     const formData = new FormData(e.target);
-    formData.append(
-      "access_key",
-      process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
-    );
-    formData.append("subject", "【高買屋】DVD無料回収のお申し込みがありました");
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("/api/recycle", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      setStatus(data.success ? "sent" : "error");
+      if (data.success) {
+        setStatus("sent");
+      } else {
+        setStatus("error");
+        setErrorMessage(data.error || "");
+      }
     } catch {
       setStatus("error");
+      setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
     }
   }
 
@@ -107,6 +140,8 @@ export default function RecycleForm() {
             tabIndex={-1}
             autoComplete="off"
           />
+          {/* スパム対策用の時間トラップ。フォーム表示時刻をサーバー側でも検証する */}
+          <input type="hidden" name="form_loaded_at" value={formLoadedAt ?? ""} />
 
           <div
             ref={step0Ref}
@@ -122,7 +157,15 @@ export default function RecycleForm() {
               <input type="email" name="email" required className={inputCls} />
             </Field>
             <Field label="電話番号" required>
-              <input type="tel" name="phone" required className={inputCls} />
+              <input
+                type="tel"
+                inputMode="tel"
+                name="phone"
+                required
+                pattern="[0-9\-]{10,13}"
+                title="ハイフンありなし、10〜11桁の数字でご入力ください"
+                className={inputCls}
+              />
             </Field>
           </div>
 
@@ -190,16 +233,41 @@ export default function RecycleForm() {
                 <h4 className="text-sm font-bold text-[#26221e] mt-2">
                   段ボールのご郵送先
                 </h4>
-                <Field label="郵便番号" required>
-                  <input type="text" name="postal_code" required className={inputCls} />
+                <Field
+                  label="郵便番号"
+                  required
+                  hint="ハイフンありなし、どちらでも構いません。"
+                >
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    name="postal_code"
+                    required
+                    pattern="\d{3}-?\d{4}"
+                    title="7桁の数字でご入力ください（ハイフンありなし可）"
+                    className={inputCls}
+                  />
                 </Field>
                 <Field label="都道府県" required>
-                  <input type="text" name="prefecture" required className={inputCls} />
+                  <select name="prefecture" required className={inputCls} defaultValue="">
+                    <option value="" disabled>
+                      選択してください
+                    </option>
+                    {PREFECTURES.map((pref) => (
+                      <option key={pref} value={pref}>
+                        {pref}
+                      </option>
+                    ))}
+                  </select>
                 </Field>
                 <Field label="市区町村" required>
                   <input type="text" name="city" required className={inputCls} />
                 </Field>
-                <Field label="それ以降の住所（建物名も記入）" required>
+                <Field
+                  label="番地・建物名"
+                  required
+                  hint="例：旭町4丁目4-10　○○マンション101"
+                >
                   <input type="text" name="address_line" required className={inputCls} />
                 </Field>
               </div>
@@ -219,11 +287,9 @@ export default function RecycleForm() {
               <SummaryRow label="郵便番号" value={summary.postal_code} />
               <SummaryRow label="都道府県" value={summary.prefecture} />
               <SummaryRow label="市区町村" value={summary.city} />
-              <SummaryRow
-                label="それ以降の住所"
-                value={summary.address_line}
-              />
+              <SummaryRow label="番地・建物名" value={summary.address_line} />
             </div>
+            <Turnstile />
             <label className="flex items-start gap-2 text-xs text-[#5c554d]">
               <input type="checkbox" required className="mt-0.5" />
               内容にお間違えなければ、こちらにチェックを入れてください。
@@ -232,7 +298,8 @@ export default function RecycleForm() {
 
           {status === "error" && (
             <p className="text-sm text-[#b3242b]">
-              送信に失敗しました。お手数ですがお電話(022-343-1588)でもお問い合わせいただけます。
+              {errorMessage ||
+                "送信に失敗しました。お手数ですがお電話(022-343-1588)でもお問い合わせいただけます。"}
             </p>
           )}
 
