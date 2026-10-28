@@ -7,6 +7,7 @@
 import { company, boxBonus } from "@/data/site";
 import { getBoxBonusMinCount } from "@/lib/campaign";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sanitizeForEmail } from "@/lib/sanitizeText";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,8 @@ export const runtime = "nodejs";
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB（1枚あたり）
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 const TO_EMAIL = "pbkaitori@gmail.com";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
 // スパム対策の「時間トラップ」。フロントエンドの判定だけに頼らず、
 // サーバー側でもフォーム表示時刻からの経過時間を検証する。
 const MIN_ELAPSED_MS = 3000;
@@ -84,18 +87,20 @@ export async function POST(request) {
     );
   }
 
+  // メール本文に差し込む値はすべてsanitizeForEmailを通し、改行・制御文字による
+  // テンプレート偽装（偽の追加行の挿入）を防ぐ。
   const course = formData.get("course") === "provisional" ? "provisional" : "speed";
-  const name = String(formData.get("name") || "");
-  const email = String(formData.get("email") || "");
-  const phone = String(formData.get("phone") || "");
-  const quantity = String(formData.get("quantity") || "");
-  const dvdCount = String(formData.get("dvd_count") || "");
-  const bdCount = String(formData.get("bd_count") || "");
-  const comicCount = String(formData.get("comic_count") || "");
-  const otherCount = String(formData.get("other_count") || "");
-  const boxOption = String(formData.get("box_option") || "");
-  const paymentMethod = String(formData.get("payment_method") || "");
-  const productDetails = String(formData.get("product_details") || "");
+  const name = sanitizeForEmail(formData.get("name"));
+  const email = sanitizeForEmail(formData.get("email"));
+  const phone = sanitizeForEmail(formData.get("phone"));
+  const quantity = sanitizeForEmail(formData.get("quantity"));
+  const dvdCount = sanitizeForEmail(formData.get("dvd_count"));
+  const bdCount = sanitizeForEmail(formData.get("bd_count"));
+  const comicCount = sanitizeForEmail(formData.get("comic_count"));
+  const otherCount = sanitizeForEmail(formData.get("other_count"));
+  const boxOption = sanitizeForEmail(formData.get("box_option"));
+  const paymentMethod = sanitizeForEmail(formData.get("payment_method"));
+  const productDetails = sanitizeForEmail(formData.get("product_details"));
 
   // 仮査定申請の最低本数（アダルトDVD・ブルーレイ・イメージDVD/BD合計5本以上、
   // またはそれらが0冊でコミックのみ10冊以上）。クライアント側のチェックを
@@ -400,7 +405,9 @@ export async function POST(request) {
   // 申込者宛の自動返信メール（画像添付なし）。
   // 店舗宛メールが送れていれば申し込み自体は成立しているため、
   // こちらが失敗してもリクエスト全体は失敗させず、ログのみ残す。
-  if (email) {
+  // メール形式・長さ上限（254文字）を満たさない場合は、任意のアドレスへの
+  // 定型文送信の悪用を避けるため自動返信をスキップする（店舗宛メールは送信済み）。
+  if (email && EMAIL_PATTERN.test(email) && email.length <= MAX_EMAIL_LENGTH) {
     try {
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",

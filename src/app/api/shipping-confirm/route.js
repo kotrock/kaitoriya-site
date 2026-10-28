@@ -6,6 +6,7 @@
 // メモリから解放されます。
 
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sanitizeForEmail } from "@/lib/sanitizeText";
 
 export const runtime = "nodejs";
 
@@ -67,10 +68,22 @@ export async function POST(request) {
     );
   }
 
-  const name = String(formData.get("name") || "");
-  const phone = String(formData.get("phone") || "");
-  const paymentMethod = String(formData.get("payment_method") || "");
-  const bankAccountInfo = String(formData.get("bank_account_info") || "");
+  // メール本文に差し込む値はすべてsanitizeForEmailを通し、改行・制御文字による
+  // テンプレート偽装（偽の追加行の挿入）を防ぐ。
+  const name = sanitizeForEmail(formData.get("name"));
+  const phone = sanitizeForEmail(formData.get("phone"));
+  const paymentMethod = sanitizeForEmail(formData.get("payment_method"));
+  const bankAccountInfo = sanitizeForEmail(formData.get("bank_account_info"));
+
+  // 電話番号の形式チェック（/api/recycle と同じ基準：数字10〜11桁、ハイフンは除いて判定）。
+  // クライアント側のpattern属性をすり抜けた場合の保険。
+  const normalizedPhone = phone.replace(/[^\d]/g, "");
+  if (!phone || normalizedPhone.length < 10 || normalizedPhone.length > 11) {
+    return Response.json(
+      { success: false, error: "電話番号の形式が正しくありません。" },
+      { status: 400 }
+    );
+  }
 
   const idFile = formData.get("id_document_photo");
   const paypayQrFile = formData.get("paypay_qr_photo");

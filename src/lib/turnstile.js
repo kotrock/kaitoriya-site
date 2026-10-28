@@ -4,9 +4,19 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 // TURNSTILE_SECRET_KEY が未設定（ローカル開発などキーを発行していない環境）の場合は
 // 検証そのものをスキップする。本番環境ではこの環境変数を設定することで、
 // NEXT_PUBLIC_TURNSTILE_SITE_KEY と連動してウィジェット表示・検証が有効になる。
+//
+// fail-closed: NODE_ENV=production で TURNSTILE_SECRET_KEY が未設定の場合は、
+// 設定漏れとみなしスキップせずに拒否する（本番でBot対策が無効化されたまま
+// 気づかず運用されることを防ぐため）。開発環境では従来どおりスキップする。
 export async function verifyTurnstile(token, remoteIp) {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
   if (!secretKey) {
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "TURNSTILE_SECRET_KEY が本番環境で未設定です。送信をすべて拒否します（fail-closed）。"
+      );
+      return { ok: false, skipped: false, reason: "not-configured" };
+    }
     return { ok: true, skipped: true, reason: null };
   }
   if (!token) {

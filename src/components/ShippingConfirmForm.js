@@ -111,7 +111,15 @@ export default function ShippingConfirmForm() {
           required
           hint="仮査定申込み時にご入力いただいた電話番号と照合いたします。"
         >
-          <input type="tel" name="phone" required className={inputCls} />
+          <input
+            type="tel"
+            inputMode="tel"
+            name="phone"
+            required
+            pattern="[0-9\-]{10,13}"
+            title="ハイフンありなし、10〜11桁の数字でご入力ください"
+            className={inputCls}
+          />
         </Field>
 
         <Field

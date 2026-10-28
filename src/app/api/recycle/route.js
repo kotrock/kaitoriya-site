@@ -3,6 +3,7 @@
 
 import { company } from "@/data/site";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sanitizeForEmail } from "@/lib/sanitizeText";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,7 @@ const MIN_ELAPSED_MS = 3000;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const POSTAL_CODE_PATTERN = /^\d{3}-?\d{4}$/;
+const MAX_EMAIL_LENGTH = 254;
 
 function normalizePhone(phone) {
   return phone.replace(/[^\d]/g, "");
@@ -68,17 +70,19 @@ export async function POST(request) {
     );
   }
 
-  const name = String(formData.get("name") || "").trim();
-  const email = String(formData.get("email") || "").trim();
-  const phone = String(formData.get("phone") || "").trim();
-  const kit = String(formData.get("kit") || "");
-  const boxSize = String(formData.get("box_size") || "");
-  const boxCount = String(formData.get("box_count") || "");
-  const boxRequest = String(formData.get("box_request") || "").trim();
-  const postalCode = String(formData.get("postal_code") || "").trim();
-  const prefecture = String(formData.get("prefecture") || "").trim();
-  const city = String(formData.get("city") || "").trim();
-  const addressLine = String(formData.get("address_line") || "").trim();
+  // メール本文に差し込む値はすべてsanitizeForEmailを通し、改行・制御文字による
+  // テンプレート偽装（偽の追加行の挿入）を防ぐ。
+  const name = sanitizeForEmail(formData.get("name"));
+  const email = sanitizeForEmail(formData.get("email"));
+  const phone = sanitizeForEmail(formData.get("phone"));
+  const kit = sanitizeForEmail(formData.get("kit"));
+  const boxSize = sanitizeForEmail(formData.get("box_size"));
+  const boxCount = sanitizeForEmail(formData.get("box_count"));
+  const boxRequest = sanitizeForEmail(formData.get("box_request"));
+  const postalCode = sanitizeForEmail(formData.get("postal_code"));
+  const prefecture = sanitizeForEmail(formData.get("prefecture"));
+  const city = sanitizeForEmail(formData.get("city"));
+  const addressLine = sanitizeForEmail(formData.get("address_line"));
 
   // クライアント側のrequired属性をすり抜けた場合の保険。
   if (!name || !email || !phone) {
@@ -88,7 +92,7 @@ export async function POST(request) {
     );
   }
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (!EMAIL_PATTERN.test(email) || email.length > MAX_EMAIL_LENGTH) {
     return Response.json(
       { success: false, error: "メールアドレスの形式が正しくありません。" },
       { status: 400 }
@@ -143,7 +147,7 @@ export async function POST(request) {
 
   const storeOnlyNotes = [
     "",
-    `送信元IPアドレス：${remoteIp || "不明"}`,
+    `送信元IPアドレス：${sanitizeForEmail(remoteIp) || "不明"}`,
     `送信日時：${sentAt}`,
   ];
 
