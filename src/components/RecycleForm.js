@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import Turnstile from "@/components/Turnstile";
+import { trackEvent } from "@/lib/analytics";
 
 // スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
 // 短すぎる場合はbotによる自動送信とみなす。
@@ -38,6 +39,7 @@ export default function RecycleForm() {
   const formRef = useRef(null);
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -75,6 +77,9 @@ export default function RecycleForm() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // 連打による二重送信（GA4イベントの二重送信含む）を防ぐ。
+    if (isSubmittingRef.current) return;
+
     // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
     const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
     if (elapsed < MIN_ELAPSED_MS) {
@@ -83,6 +88,7 @@ export default function RecycleForm() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setStatus("sending");
     setErrorMessage("");
 
@@ -96,6 +102,7 @@ export default function RecycleForm() {
       const data = await res.json();
       if (data.success) {
         setStatus("sent");
+        trackEvent("generate_lead", { form_name: "recycle" });
       } else {
         setStatus("error");
         setErrorMessage(data.error || "");
@@ -103,6 +110,8 @@ export default function RecycleForm() {
     } catch {
       setStatus("error");
       setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
+    } finally {
+      isSubmittingRef.current = false;
     }
   }
 
