@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckCircleIcon } from "@/components/Icons";
 import { StepIndicator, SummaryRow } from "@/components/FormSteps";
-import Turnstile from "@/components/Turnstile";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import { trackEvent } from "@/lib/analytics";
+
+const TURNSTILE_PENDING_MESSAGE =
+  "確認がうまくいきませんでした。もう一度、確認のチェックが終わってから、送信してください。";
 
 // スパム対策の「時間トラップ」。フォームが表示されてから送信までの経過時間が
 // 短すぎる場合はbotによる自動送信とみなす。
@@ -35,11 +38,20 @@ export default function RecycleForm() {
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
   const [formLoadedAt, setFormLoadedAt] = useState(null);
+  const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_ENABLED);
   const cardRef = useRef(null);
   const formRef = useRef(null);
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
   const isSubmittingRef = useRef(false);
+  const turnstileRef = useRef(null);
+
+  // トークンは1回使い切り・期限切れがあるため、送信が終わった（成功・失敗問わず）
+  // 直後は必ず捨てて、次の送信に備えて新しいトークンを取り直す。
+  function resetTurnstile() {
+    setTurnstileReady(!TURNSTILE_ENABLED);
+    turnstileRef.current?.reset();
+  }
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -88,6 +100,14 @@ export default function RecycleForm() {
       return;
     }
 
+    // トークンがまだ取得できていない（ウィジェットの確認が終わっていない）場合は、
+    // 送信せずにその旨を伝える。ボタン側も無効化しているが、保険として二重にチェックする。
+    if (!turnstileReady) {
+      setStatus("error");
+      setErrorMessage(TURNSTILE_PENDING_MESSAGE);
+      return;
+    }
+
     isSubmittingRef.current = true;
     setStatus("sending");
     setErrorMessage("");
@@ -112,6 +132,8 @@ export default function RecycleForm() {
       setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
     } finally {
       isSubmittingRef.current = false;
+      // 使用済み・期限切れの可能性があるトークンを必ず捨てて、次回分を取り直す。
+      resetTurnstile();
     }
   }
 
@@ -298,12 +320,23 @@ export default function RecycleForm() {
               <SummaryRow label="市区町村" value={summary.city} />
               <SummaryRow label="番地・建物名" value={summary.address_line} />
             </div>
-            <Turnstile />
             <label className="flex items-start gap-2 text-xs text-[#5c554d]">
               <input type="checkbox" required className="mt-0.5" />
               内容にお間違えなければ、こちらにチェックを入れてください。
             </label>
           </div>
+
+          {/*
+            他のステップ用div（className="hidden" = display:none）の中には置かない。
+            Turnstileはdisplay:noneの間はバックグラウンドでの検証・reset()後の
+            再検証が止まってしまうため、ステップに関わらず常に表示状態で保持する。
+          */}
+          <Turnstile
+            ref={turnstileRef}
+            onVerify={() => setTurnstileReady(true)}
+            onExpire={() => setTurnstileReady(false)}
+            onError={() => setTurnstileReady(false)}
+          />
 
           {status === "error" && (
             <p className="text-sm text-[#b3242b]">
@@ -324,6 +357,7 @@ export default function RecycleForm() {
             )}
             {step < STEPS.length - 1 ? (
               <button
+                key="next"
                 type="button"
                 onClick={goNext}
                 className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22]"
@@ -332,11 +366,16 @@ export default function RecycleForm() {
               </button>
             ) : (
               <button
+                key="submit"
                 type="submit"
-                disabled={status === "sending"}
+                disabled={status === "sending" || !turnstileReady}
                 className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
               >
-                {status === "sending" ? "送信中…" : "この内容で申し込む"}
+                {status === "sending"
+                  ? "送信中…"
+                  : !turnstileReady
+                  ? "確認中…"
+                  : "この内容で申し込む"}
               </button>
             )}
           </div>

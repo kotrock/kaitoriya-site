@@ -62,7 +62,7 @@ export async function POST(request) {
         success: false,
         error: isServiceIssue
           ? "確認処理が混み合っています。時間をおいて再度お試しください。"
-          : "送信に失敗しました。もう一度お試しください。",
+          : "確認がうまくいきませんでした。もう一度、確認のチェックが終わってから、送信してください。",
       },
       { status: 400 }
     );

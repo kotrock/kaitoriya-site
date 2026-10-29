@@ -7,7 +7,7 @@ import { StepIndicator, SummaryRow } from "@/components/FormSteps";
 import { payoutOptions, boxBonus } from "@/data/site";
 import { getBoxBonusMinCount } from "@/lib/campaign";
 import { trackEvent } from "@/lib/analytics";
-import Turnstile from "@/components/Turnstile";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import ReassurancePoints from "@/components/ReassurancePoints";
 import {
   compressImageToTarget,
@@ -88,6 +88,9 @@ function setInputFiles(input, files) {
   input.files = dataTransfer.files;
 }
 
+const TURNSTILE_PENDING_MESSAGE =
+  "確認がうまくいきませんでした。もう一度、確認のチェックが終わってから、送信してください。";
+
 export default function ApplicationForm() {
   const boxBonusMinCount = getBoxBonusMinCount();
   const [course, setCourse] = useState(""); // "" | "speed" | "provisional"
@@ -104,12 +107,22 @@ export default function ApplicationForm() {
   const [step, setStep] = useState(0);
   const [summary, setSummary] = useState({});
   const [formLoadedAt, setFormLoadedAt] = useState(null);
+  const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_ENABLED);
   const cardRef = useRef(null);
   const formRef = useRef(null);
   const step0Ref = useRef(null);
   const step1Ref = useRef(null);
   const step2Ref = useRef(null);
   const quantityErrorRef = useRef(null);
+  const isSubmittingRef = useRef(false);
+  const turnstileRef = useRef(null);
+
+  // トークンは1回使い切り・期限切れがあるため、送信が終わった（成功・失敗問わず）
+  // 直後は必ず捨てて、次の送信に備えて新しいトークンを取り直す。
+  function resetTurnstile() {
+    setTurnstileReady(!TURNSTILE_ENABLED);
+    turnstileRef.current?.reset();
+  }
 
   const stepRefs = [step0Ref, step1Ref, step2Ref];
 
@@ -274,6 +287,9 @@ export default function ApplicationForm() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // 連打による二重送信を防ぐ。
+    if (isSubmittingRef.current) return;
+
     // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
     const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
     if (elapsed < MIN_ELAPSED_MS) {
@@ -299,70 +315,85 @@ export default function ApplicationForm() {
       }
     }
 
+    // トークンがまだ取得できていない（ウィジェットの確認が終わっていない）場合は、
+    // 送信せずにその旨を伝える。ボタン側も無効化しているが、保険として二重にチェックする。
+    if (!turnstileReady) {
+      setStatus("error");
+      setErrorMessage(TURNSTILE_PENDING_MESSAGE);
+      return;
+    }
+
+    isSubmittingRef.current = true;
     setStatus("sending");
     setErrorMessage("");
 
     const formData = new FormData(e.target);
 
-    let res;
     try {
-      res = await fetch("/api/application", {
-        method: "POST",
-        body: formData,
-      });
-    } catch {
-      // fetch自体が失敗（オフライン等）。レスポンスを受け取れていない。
-      setStatus("error");
-      setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
-      trackEvent("generate_lead_error", {
-        form_name: "application",
-        error_type: "network",
-      });
-      return;
-    }
+      let res;
+      try {
+        res = await fetch("/api/application", {
+          method: "POST",
+          body: formData,
+        });
+      } catch {
+        // fetch自体が失敗（オフライン等）。レスポンスを受け取れていない。
+        setStatus("error");
+        setErrorMessage("通信エラーが発生しました。電波の良い場所で再度お試しください。");
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: "network",
+        });
+        return;
+      }
 
-    // Vercelの413 (リクエストボディが大きすぎる場合) はJSONではないため、
-    // res.json()を試みる前にステータスで判定する。
-    if (res.status === 413) {
-      setStatus("error");
-      setErrorMessage(
-        "画像の合計サイズが大きすぎます。枚数を減らして再度お試しください。"
-      );
-      trackEvent("generate_lead_error", {
-        form_name: "application",
-        error_type: "too_large",
-      });
-      return;
-    }
+      // Vercelの413 (リクエストボディが大きすぎる場合) はJSONではないため、
+      // res.json()を試みる前にステータスで判定する。
+      if (res.status === 413) {
+        setStatus("error");
+        setErrorMessage(
+          "画像の合計サイズが大きすぎます。枚数を減らして再度お試しください。"
+        );
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: "too_large",
+        });
+        return;
+      }
 
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      // JSONでない予期しないレスポンス（プラットフォーム側のエラーページ等）。
-      setStatus("error");
-      setErrorMessage("");
-      trackEvent("generate_lead_error", {
-        form_name: "application",
-        error_type: classifyError(res.status, null),
-      });
-      return;
-    }
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        // JSONでない予期しないレスポンス（プラットフォーム側のエラーページ等）。
+        setStatus("error");
+        setErrorMessage("");
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: classifyError(res.status, null),
+        });
+        return;
+      }
 
-    if (data.success) {
-      setStatus("sent");
-      trackEvent("generate_lead", {
-        form_name: "application",
-        course,
-        item_count: computeItemCount(formData, course),
-      });
-    } else {
-      setStatus("error");
-      setErrorMessage(data.error || "");
-      trackEvent("generate_lead_error", {
-        form_name: "application",
-        error_type: classifyError(res.status, data.error),
-      });
+      if (data.success) {
+        setStatus("sent");
+        trackEvent("generate_lead", {
+          form_name: "application",
+          course,
+          item_count: computeItemCount(formData, course),
+        });
+      } else {
+        setStatus("error");
+        setErrorMessage(data.error || "");
+        trackEvent("generate_lead_error", {
+          form_name: "application",
+          error_type: classifyError(res.status, data.error),
+        });
+      }
+    } finally {
+      isSubmittingRef.current = false;
+      // 使用済み・期限切れの可能性があるトークンを必ず捨てて、次回分を取り直す。
+      resetTurnstile();
     }
   }
 
@@ -793,8 +824,19 @@ export default function ApplicationForm() {
             <input type="checkbox" required className="mt-0.5" />
             利用規約・プライバシーポリシーに同意の上、この内容で申し込みます。
           </label>
-          <Turnstile />
         </div>
+
+        {/*
+          他のステップ用div（className="hidden" = display:none）の中には置かない。
+          Turnstileはdisplay:noneの間はバックグラウンドでの検証・reset()後の
+          再検証が止まってしまうため、ステップに関わらず常に表示状態で保持する。
+        */}
+        <Turnstile
+          ref={turnstileRef}
+          onVerify={() => setTurnstileReady(true)}
+          onExpire={() => setTurnstileReady(false)}
+          onError={() => setTurnstileReady(false)}
+        />
 
         {compressing && (
           <p className="text-xs text-[#726b5e] flex items-center gap-1.5">
@@ -832,6 +874,7 @@ export default function ApplicationForm() {
           )}
           {step < STEPS.length - 1 ? (
             <button
+              key="next"
               type="button"
               onClick={goNext}
               disabled={compressing}
@@ -841,11 +884,16 @@ export default function ApplicationForm() {
             </button>
           ) : (
             <button
+              key="submit"
               type="submit"
-              disabled={status === "sending" || compressing}
+              disabled={status === "sending" || compressing || !turnstileReady}
               className="flex-1 bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
             >
-              {status === "sending" ? "送信中…" : "この内容で申し込む"}
+              {status === "sending"
+                ? "送信中…"
+                : !turnstileReady
+                ? "確認中…"
+                : "この内容で申し込む"}
             </button>
           )}
         </div>

@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CheckCircleIcon } from "@/components/Icons";
 import { trackEvent } from "@/lib/analytics";
-import Turnstile from "@/components/Turnstile";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
+
+const TURNSTILE_PENDING_MESSAGE =
+  "確認がうまくいきませんでした。もう一度、確認のチェックが終わってから、送信してください。";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
@@ -21,11 +24,21 @@ export default function ShippingConfirmForm() {
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorMessage, setErrorMessage] = useState("");
   const [formLoadedAt, setFormLoadedAt] = useState(null);
+  const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_ENABLED);
+  const isSubmittingRef = useRef(false);
+  const turnstileRef = useRef(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormLoadedAt(Date.now());
   }, []);
+
+  // トークンは1回使い切り・期限切れがあるため、送信が終わった（成功・失敗問わず）
+  // 直後は必ず捨てて、次の送信に備えて新しいトークンを取り直す。
+  function resetTurnstile() {
+    setTurnstileReady(!TURNSTILE_ENABLED);
+    turnstileRef.current?.reset();
+  }
 
   function handleSingleFileChange(e, setPhoto) {
     const input = e.target;
@@ -43,6 +56,9 @@ export default function ShippingConfirmForm() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // 連打による二重送信を防ぐ。
+    if (isSubmittingRef.current) return;
+
     // 時間トラップ：表示直後の即時送信はbotとみなし、APIを呼ばずに失敗扱いにする。
     const elapsed = formLoadedAt ? Date.now() - formLoadedAt : 0;
     if (elapsed < MIN_ELAPSED_MS) {
@@ -51,6 +67,15 @@ export default function ShippingConfirmForm() {
       return;
     }
 
+    // トークンがまだ取得できていない（ウィジェットの確認が終わっていない）場合は、
+    // 送信せずにその旨を伝える。ボタン側も無効化しているが、保険として二重にチェックする。
+    if (!turnstileReady) {
+      setStatus("error");
+      setErrorMessage(TURNSTILE_PENDING_MESSAGE);
+      return;
+    }
+
+    isSubmittingRef.current = true;
     setStatus("sending");
     setErrorMessage("");
 
@@ -71,6 +96,10 @@ export default function ShippingConfirmForm() {
       }
     } catch {
       setStatus("error");
+    } finally {
+      isSubmittingRef.current = false;
+      // 使用済み・期限切れの可能性があるトークンを必ず捨てて、次回分を取り直す。
+      resetTurnstile();
     }
   }
 
@@ -232,7 +261,12 @@ export default function ShippingConfirmForm() {
           )}
         </div>
 
-        <Turnstile />
+        <Turnstile
+          ref={turnstileRef}
+          onVerify={() => setTurnstileReady(true)}
+          onExpire={() => setTurnstileReady(false)}
+          onError={() => setTurnstileReady(false)}
+        />
 
         {status === "error" && (
           <p className="text-sm text-[#b3242b]">
@@ -243,10 +277,14 @@ export default function ShippingConfirmForm() {
 
         <button
           type="submit"
-          disabled={status === "sending"}
+          disabled={status === "sending" || !turnstileReady}
           className="bg-[#b3242b] text-white text-sm font-bold py-4 rounded-full hover:bg-[#8f1c22] disabled:opacity-60"
         >
-          {status === "sending" ? "送信中…" : "この内容で送信する"}
+          {status === "sending"
+            ? "送信中…"
+            : !turnstileReady
+            ? "確認中…"
+            : "この内容で送信する"}
         </button>
       </form>
     </div>
